@@ -1,0 +1,26 @@
+scalar Date
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  createdAt: Date
+  updatedAt: Date
+}
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+type Query {
+  user(id: ID!): User!
+  test: [User!]!
+}
+
+type Mutation {
+  updateUser(id: ID!, name: String!, email: String!, password: String!): User!
+  deleteUser(id: ID!): User!
+  login(email: String!, password: String!): AuthPayload!
+  signUp(name: String!, email: String!, password: String!): AuthPayload!
+}
