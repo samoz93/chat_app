@@ -5,15 +5,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CONFIG } from './config';
-import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { CONFIG } from './config';
+import { MessagesGateway } from './messages/messages.gateway';
+import { MessagesModule } from './messages/messages.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'db',
+      host: CONFIG.dbHost,
       port: CONFIG.dbPort,
       database: CONFIG.dbDatabase,
       username: CONFIG.dbUserName,
@@ -26,16 +28,28 @@ import { AuthModule } from './auth/auth.module';
       subscriptions: {
         'graphql-ws': true,
       },
+      formatError: (err) => {
+        return {
+          message: err.message,
+          path: err.path,
+        };
+      },
+      // context: ({ req, res }) => ({ req, res }),
       typePaths: ['./**/*.graphql'],
       definitions: {
         path: join(process.cwd(), 'src/schema/graphql.ts'),
       },
-      playground: true,
+      playground: {
+        settings: {
+          'request.credentials': 'include',
+        },
+      },
     }),
     UserModule,
     AuthModule,
+    MessagesModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MessagesGateway],
 })
 export class AppModule {}

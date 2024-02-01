@@ -1,53 +1,77 @@
 import { HttpException } from '@nestjs/common';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
-import { JwtService } from '@nestjs/jwt';
-import { CONFIG } from 'src/config';
-import { AuthPayload } from 'src/schema/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Request, Response } from 'express';
+import { AuthPayload, NewUserInput } from 'src/schema/graphql';
+import { JWT_TOKEN, REFRESH_TOKEN } from 'src/types';
 import { UserService } from 'src/user/user.service';
+import { GraphResponse, createToken, validateRefreshToken } from 'src/utils';
 import { AuthService } from './auth.service';
-import { IsPublic } from './meta';
-
 @Resolver('Auth')
+// @UseFilters(new HttpExceptionFilter())
 export class AuthResolver {
   constructor(
     private authService: AuthService,
     private userService: UserService,
-    private jwt: JwtService,
   ) {}
 
   @Mutation('login')
-  @IsPublic()
   async logIn(
     @Args('email') email: string,
     @Args('password') password: string,
+    @GraphResponse() res: Response,
   ): Promise<AuthPayload> {
     const authPayload = await this.authService.validateUser(email, password);
 
-    if (!authPayload) {
-      throw new HttpException('Invalid credentials', 401);
-    }
+    res.cookie(REFRESH_TOKEN, authPayload.refreshToken);
+    res.cookie(JWT_TOKEN, authPayload.token);
 
-    return authPayload;
+    return {
+      token: authPayload.token,
+      user: authPayload.user,
+    };
   }
 
   @Mutation('signUp')
-  @IsPublic()
   async signup(
-    @Args('email') email: string,
-    @Args('name') name: string,
-    @Args('password') password: string,
+    @Args('data') data: NewUserInput,
+    @GraphResponse() res: Response,
   ): Promise<AuthPayload> {
-    const user = await this.userService.createUser({ email, name, password });
-    const jwt = this.jwt.sign(
-      { ...user },
-      {
-        secret: CONFIG.jwtSecret,
-      },
-    );
+    const user = await this.userService.createUser(data);
+    const jwt = createToken(user);
+
+    res.cookie(REFRESH_TOKEN, jwt.refreshToken);
+    res.cookie(JWT_TOKEN, jwt.token);
+    return {
+      user,
+      token: jwt.token,
+    };
+  }
+
+  @Query('refresh')
+  async refreshToken(
+    @Context('req') req: Request,
+    @GraphResponse() res: Response,
+  ): Promise<AuthPayload> {
+    const refreshToken = req.cookies[REFRESH_TOKEN];
+
+    if (!refreshToken) {
+      throw new HttpException('Invalid refresh token', 401);
+    }
+    const { id } = await validateRefreshToken(refreshToken);
+    const user = await this.userService.getUserById(id);
+    const jwt = createToken(user);
+
+    res.cookie(REFRESH_TOKEN, jwt.refreshToken);
+    res.cookie(JWT_TOKEN, jwt.token);
 
     return {
       user,
-      token: jwt,
+      token: jwt.token,
     };
+  }
+
+  @Query('test')
+  async test(): Promise<any> {
+    return this.userService.getAllUsers();
   }
 }

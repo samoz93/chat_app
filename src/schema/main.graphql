@@ -16,11 +16,18 @@ type AuthPayload {
 type Query {
   user(id: ID!): User!
   test: [User!]!
+  refresh: AuthPayload!
+}
+
+input NewUserInput {
+  email: String!
+  password: String!
+  name: String!
 }
 
 type Mutation {
   updateUser(id: ID!, name: String!, email: String!, password: String!): User!
   deleteUser(id: ID!): User!
   login(email: String!, password: String!): AuthPayload!
-  signUp(name: String!, email: String!, password: String!): AuthPayload!
+  signUp(data: NewUserInput!): AuthPayload!
 }

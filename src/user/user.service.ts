@@ -1,26 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as _ from 'lodash';
 import { UserEntity } from 'src/entities/user.entity';
+import { sanitizeUser } from 'src/utils';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
-  private sanitizeUser(user: UserEntity) {
-    return _.omit(user, ['password']);
-  }
-
   constructor(
     @InjectRepository(UserEntity)
     private userEntity: Repository<UserEntity>,
   ) {}
 
-  getUserByEmail(email: string) {
+  async getUserByEmail(email: string) {
     return this.userEntity
       .findOneBy({
         email,
       })
-      .then(this.sanitizeUser);
+      .then(sanitizeUser);
   }
 
   getAllUsers() {
@@ -29,12 +25,12 @@ export class UserService {
     });
   }
 
-  getUserById(id: string) {
+  async getUserById(id: string) {
     return this.userEntity
       .findOneBy({
         id,
       })
-      .then(this.sanitizeUser);
+      .then(sanitizeUser);
   }
 
   deleteUser(id: string) {
@@ -57,6 +53,9 @@ export class UserService {
       name,
       password,
     });
-    return this.userEntity.save(data).then(this.sanitizeUser);
+
+    const newData = await this.userEntity.save(data).then(sanitizeUser);
+
+    return newData;
   }
 }

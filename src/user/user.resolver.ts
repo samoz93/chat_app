@@ -1,10 +1,10 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { MyAuthGuard } from 'src/auth/auth.guard';
+import { GQAuthGuard } from 'src/auth/auth.guard';
 import { UserService } from './user.service';
 
 @Resolver('User')
-@UseGuards(MyAuthGuard)
+@UseGuards(GQAuthGuard)
 export class UserResolver {
   constructor(private service: UserService) {}
 

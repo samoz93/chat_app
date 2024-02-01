@@ -1,38 +1,37 @@
-import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as _ from 'lodash';
-import { CONFIG } from 'src/config';
 import { UserEntity } from 'src/entities/user.entity';
 import { AuthPayload } from 'src/schema/graphql';
+import { createToken, sanitizeUser } from 'src/utils';
 import { Repository } from 'typeorm';
-
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserEntity)
     private userEntity: Repository<UserEntity>,
-    private jwt: JwtService,
   ) {}
 
-  async validateUser(email: string, pass: string): Promise<AuthPayload> {
+  async validateUser(
+    email: string,
+    pass: string,
+  ): Promise<AuthPayload & { refreshToken: string }> {
     const user = await this.userEntity.findOneBy({
       email,
     });
     if (user && user.password === pass) {
-      const sanitizedUser = _.omit(user, ['password']);
-      const jwt = this.jwt.sign(
-        { ...sanitizedUser },
-        {
-          secret: CONFIG.jwtSecret,
-        },
-      );
+      const sanitizedUser = sanitizeUser(user);
+      const jwt = createToken(sanitizedUser);
 
       return {
-        token: jwt,
+        refreshToken: jwt.refreshToken,
+        token: jwt.token,
         user: sanitizedUser,
       };
     }
-    return null;
+
+    throw new HttpException(
+      'Invalid credentials, User not found or password is incorrect',
+      401,
+    );
   }
 }
