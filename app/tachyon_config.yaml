@@ -1,0 +1,7 @@
+# Additional information about this file can be found at
+# https://dart.dev/guides/language/analysis-options
+file_generation_paths: # which files/paths to include for build
+  - "lib/models/**"
+
+plugins:
+  - data_class_plugin # register data_class_plugin
