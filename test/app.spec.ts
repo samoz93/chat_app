@@ -1,6 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { CONFIG } from 'src/config';
 import { UserEntity } from 'src/entities/user.entity';
 import { MockUsers } from 'src/test_utils/constants';
 import * as request from 'supertest';
@@ -30,6 +31,9 @@ const signInQuery = `mutation Login($email: String!, $password: String!) {
     }
 }
 `;
+
+console.log('CONFIG', CONFIG);
+
 describe('GraphQl, Testing User functionalities', () => {
   let app: INestApplication;
 
@@ -83,6 +87,29 @@ describe('GraphQl, Testing User functionalities', () => {
         expect(res.body.data.login.user.name).toEqual(testUser.name);
         expect(res.body.data.login.user.id).toBeDefined();
         expect(res.body.data.login.token).toBeDefined();
+      });
+  });
+
+  it('/graphql Signup process is uniq (no duplicate emails)', async () => {
+    const testUser = MockUsers[0];
+    await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        query: signupQuery,
+        variables: testUser,
+      })
+      .expect(200);
+
+    await request(app.getHttpServer())
+      .post('/graphql')
+      .send({
+        query: signupQuery,
+        variables: testUser,
+      })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.errors[0].message).toEqual('User already exists');
+        expect(res.body.data).toBeNull();
       });
   });
 });

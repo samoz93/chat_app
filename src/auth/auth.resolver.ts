@@ -36,11 +36,17 @@ export class AuthResolver {
     @Args('data') data: NewUserInput,
     @GraphResponse() res: Response,
   ): Promise<AuthPayload> {
+    const userExists = await this.userService.userExists(data.email);
+    if (userExists) {
+      throw new HttpException('User already exists', 409);
+    }
+
     const user = await this.userService.createUser(data);
     const jwt = createToken(user);
 
     res.cookie(REFRESH_TOKEN, jwt.refreshToken);
     res.cookie(JWT_TOKEN, jwt.token);
+
     return {
       user,
       token: jwt.token,

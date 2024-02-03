@@ -58,4 +58,8 @@ export class UserService {
 
     return newData;
   }
+
+  async userExists(email: string) {
+    return this.userEntity.findOneBy({ email }).then((user) => !!user);
+  }
 }
