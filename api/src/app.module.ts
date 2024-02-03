@@ -29,6 +29,8 @@ import { UserModule } from './user/user.module';
         'graphql-ws': true,
       },
       formatError: (err) => {
+        console.log('err', err);
+
         return {
           message: err.message,
           path: err.path,

@@ -5,7 +5,6 @@ import { CONFIG } from 'src/config';
 import { UserEntity } from 'src/entities/user.entity';
 import { MockUsers } from 'src/test_utils/constants';
 import * as request from 'supertest';
-import { Repository } from 'typeorm';
 import { AppModule } from './../src/app.module';
 
 const signupQuery = `mutation signUp($email: String!, $password: String!, $name: String!) {
@@ -34,8 +33,33 @@ const signInQuery = `mutation Login($email: String!, $password: String!) {
 
 console.log('CONFIG', CONFIG);
 
+async function clearDatabase(app: INestApplication): Promise<void> {
+  // const entityManager = app.get<EntityManager>(EntityManager);
+  // const tableNames = entityManager.connection.entityMetadatas.map(
+  //   (entity) => entity.tableName,
+  // );
+  // for await (const tableName of tableNames) {
+  //   await entityManager.query(
+  //     `
+  //       BEGIN;
+  //       ALTER TABLE ${tableName} DISABLE TRIGGER ALL;
+  //       TRUNCATE TABLE ${tableName};
+  //       ALTER TABLE ${tableName} ENABLE TRIGGER ALL;
+  //       COMMIT;
+  //     `,
+  //   );
+  // }
+}
+
 describe('GraphQl, Testing User functionalities', () => {
   let app: INestApplication;
+  afterEach(async () => {
+    const repo = app.get(getRepositoryToken(UserEntity));
+    await repo.delete({});
+  });
+  afterAll(async () => {
+    await app.close();
+  });
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -44,8 +68,6 @@ describe('GraphQl, Testing User functionalities', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
-    const db = app.get<Repository<UserEntity>>(getRepositoryToken(UserEntity));
-    db.clear();
   });
 
   it('/graphql A user can sign up for an account', () => {
@@ -108,6 +130,8 @@ describe('GraphQl, Testing User functionalities', () => {
       })
       .expect(200)
       .expect((res) => {
+        console.log('res.body', res.body);
+
         expect(res.body.errors[0].message).toEqual('User already exists');
         expect(res.body.data).toBeNull();
       });

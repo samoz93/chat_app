@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-test-dep
+  namespace: chat-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-test
+  template:
+    metadata:
+      labels:
+        app: api-test
+    spec:
+      containers:
+        - name: api-test
+          image: samoz93/chat-api
+          ports:
+            - containerPort: 3000
+          command: ["npm", "run", "test:watch"]
+          envFrom:
+            - configMapRef:
+                name: chat-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-api-service-test
+  namespace: chat-app
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+  selector:
+    app: api-test

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chat-config
+  namespace: chat-app
+data:
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: samoz9393
+  POSTGRES_DB: chat_db
+  POSTGRES_PORT: "5432"
+  JWT_SECRET: samozIsStrugglingWithLife
+  COOKIES_SECRET: ComingUpWithSecretsIsHardMaybeIShouldUseSomeGenerator
+  POSTGRES_HOST: postgres-service
+  REDIS_PORT: "6379"
+  REDIS_HOST: redis-srv

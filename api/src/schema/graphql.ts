@@ -18,6 +18,7 @@ export interface User {
     id: string;
     name: string;
     email: string;
+    rooms?: Nullable<Nullable<ChatRoom>[]>;
     createdAt?: Nullable<Date>;
     updatedAt?: Nullable<Date>;
 }
@@ -25,6 +26,22 @@ export interface User {
 export interface AuthPayload {
     token: string;
     user: User;
+}
+
+export interface Message {
+    id: string;
+    text: string;
+    user: User;
+    createdAt?: Nullable<Date>;
+    updatedAt?: Nullable<Date>;
+}
+
+export interface ChatRoom {
+    id: string;
+    name: string;
+    owner: User;
+    users: User[];
+    messages: Message[];
 }
 
 export interface IQuery {

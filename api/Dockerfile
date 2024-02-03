@@ -39,4 +39,4 @@ COPY --from=development /api/dist ./api/dist
 
 EXPOSE 3000
 
-CMD ["node", "dist/main"]
+CMD ["pnpm", "run", "start:dev"]

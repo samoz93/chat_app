@@ -13,32 +13,27 @@ final items = [
   CarouselItem(
       title: "Mia Khalifa",
       image:
-          "https://phantom-marca.unidadeditorial.es/316416e2aacead1e406ca171a5ab142e/resize/1200/f/jpg/assets/multimedia/imagenes/2023/10/10/16969425644523.jpg",
-      isLiked: true),
-  CarouselItem(
-      title: "Samoz Samoz",
-      image:
-          "https://www.pinkvilla.com/pics/480x480/871625916_mia-khalifa_202310.jpg",
+          "https://cdn.pixabay.com/photo/2016/12/27/06/38/albert-einstein-1933340_1280.jpg",
       isLiked: true),
   CarouselItem(
       title: "Hi",
       image:
-          "https://phantom-marca.unidadeditorial.es/316416e2aacead1e406ca171a5ab142e/resize/1200/f/jpg/assets/multimedia/imagenes/2023/10/10/16969425644523.jpg",
+          "https://cdn.pixabay.com/photo/2016/12/27/06/38/albert-einstein-1933340_1280.jpg",
       isLiked: true),
   CarouselItem(
       title: "Hi",
       image:
-          "https://phantom-marca.unidadeditorial.es/316416e2aacead1e406ca171a5ab142e/resize/1200/f/jpg/assets/multimedia/imagenes/2023/10/10/16969425644523.jpg",
+          "https://cdn.pixabay.com/photo/2016/12/27/06/38/albert-einstein-1933340_1280.jpg",
       isLiked: true),
   CarouselItem(
       title: "Hi",
       image:
-          "https://phantom-marca.unidadeditorial.es/316416e2aacead1e406ca171a5ab142e/resize/1200/f/jpg/assets/multimedia/imagenes/2023/10/10/16969425644523.jpg",
+          "https://cdn.pixabay.com/photo/2016/12/27/06/38/albert-einstein-1933340_1280.jpg",
       isLiked: true),
   CarouselItem(
       title: "Hi",
       image:
-          "https://phantom-marca.unidadeditorial.es/316416e2aacead1e406ca171a5ab142e/resize/1200/f/jpg/assets/multimedia/imagenes/2023/10/10/16969425644523.jpg",
+          "https://cdn.pixabay.com/photo/2016/12/27/06/38/albert-einstein-1933340_1280.jpg",
       isLiked: true),
 ];
 

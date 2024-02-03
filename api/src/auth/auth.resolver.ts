@@ -1,13 +1,14 @@
-import { HttpException } from '@nestjs/common';
+import { HttpException, UseFilters } from '@nestjs/common';
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Request, Response } from 'express';
+import { HttpExceptionFilter } from 'src/http-exception-filter/http-exception-filter.filter';
 import { AuthPayload, NewUserInput } from 'src/schema/graphql';
 import { JWT_TOKEN, REFRESH_TOKEN } from 'src/types';
 import { UserService } from 'src/user/user.service';
 import { GraphResponse, createToken, validateRefreshToken } from 'src/utils';
 import { AuthService } from './auth.service';
 @Resolver('Auth')
-// @UseFilters(new HttpExceptionFilter())
+@UseFilters(new HttpExceptionFilter())
 export class AuthResolver {
   constructor(
     private authService: AuthService,

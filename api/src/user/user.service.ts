@@ -52,6 +52,7 @@ export class UserService {
       email,
       name,
       password,
+      rooms: [],
     });
 
     const newData = await this.userEntity.save(data).then(sanitizeUser);

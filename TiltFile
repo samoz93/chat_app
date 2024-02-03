@@ -1,0 +1,31 @@
+allow_k8s_contexts( "docker-desktop"); 
+k8s_context('docker-desktop')
+k8s_namespace("chat-app")
+
+
+
+k8s_yaml(listdir ( "./infra/dev" , recursive = True ) )
+
+docker_build('samoz93/chat-api', 'api',
+    build_args={'node_env': 'development'},
+    target="development",
+    entrypoint="npm run start:dev",
+    ignore="*.spec",
+    live_update=[
+        sync('./api', '/api'),
+        
+        run('cd /api && pnpm i', trigger=['./api/package.json']),
+])
+
+
+
+# load('ext://deployment', 'deployment_create')
+# deployment_create(
+#   'postgres-test',
+#   ports='6379',
+#   image="postgres:alpine",
+#   readiness_probe={'exec':{'command':['redis-cli','ping']}}
+# )
+
+
+# k8s_resource('postgres-test', port_forwards=6379)

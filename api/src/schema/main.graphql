@@ -4,6 +4,7 @@ type User {
   id: ID!
   name: String!
   email: String!
+  rooms: [ChatRoom]
   createdAt: Date
   updatedAt: Date
 }
@@ -11,6 +12,22 @@ type User {
 type AuthPayload {
   token: String!
   user: User!
+}
+
+type Message {
+  id: ID!
+  text: String!
+  user: User!
+  createdAt: Date
+  updatedAt: Date
+}
+
+type ChatRoom {
+  id: ID!
+  name: String!
+  owner: User!
+  users: [User!]!
+  messages: [Message!]!
 }
 
 type Query {
