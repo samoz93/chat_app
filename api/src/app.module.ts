@@ -9,8 +9,8 @@ import { AuthModule } from './auth/auth.module';
 import { CONFIG } from './config';
 import { MessagesGateway } from './messages/messages.gateway';
 import { MessagesModule } from './messages/messages.module';
+import { SharedModule } from './shared/shared.module';
 import { UserModule } from './user/user.module';
-import { TokenService } from './utils';
 
 @Module({
   imports: [
@@ -30,8 +30,6 @@ import { TokenService } from './utils';
         'graphql-ws': true,
       },
       formatError: (err) => {
-        console.log('err', err);
-
         return {
           message: err.message,
           path: err.path,
@@ -51,7 +49,7 @@ import { TokenService } from './utils';
     UserModule,
     AuthModule,
     MessagesModule,
-    TokenService,
+    SharedModule,
   ],
   controllers: [AppController],
   providers: [AppService, MessagesGateway],

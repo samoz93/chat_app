@@ -1,7 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { CONFIG } from 'src/config';
 import { UserEntity } from 'src/entities/user.entity';
 import { MockUsers } from 'src/test_utils/constants';
 import * as request from 'supertest';
@@ -30,8 +29,6 @@ const signInQuery = `mutation Login($email: String!, $password: String!) {
     }
 }
 `;
-
-console.log('CONFIG', CONFIG);
 
 async function clearDatabase(app: INestApplication): Promise<void> {
   // const entityManager = app.get<EntityManager>(EntityManager);

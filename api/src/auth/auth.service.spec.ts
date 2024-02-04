@@ -11,6 +11,7 @@ describe('AuthService', () => {
   let service: AuthService;
   const testUser = MockUsers[0];
   let repo: Repository<UserEntity>;
+  let tokenService: TokenService;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -30,18 +31,23 @@ describe('AuthService', () => {
 
     service = module.get<AuthService>(AuthService);
     repo = module.get(getRepositoryToken(UserEntity));
+    tokenService = module.get(TokenService);
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  it('Expect to have a jwt token', async () => {
-    const user = await service.validateUser(testUser.email, testUser.password);
-    expect(user).toBeDefined();
+  it('should have jwt token', async () => {
+    const result = await service.validateUser(
+      testUser.email,
+      testUser.password,
+    );
+
+    expect(result).toBeDefined();
     expect(repo.findOneBy).toHaveBeenCalledTimes(1);
-    expect(user.token).toBeDefined();
-    expect(user.refreshToken).toBeDefined();
+    expect(result.token).toBeDefined();
+    expect(result.refreshToken).toBeDefined();
   });
 
   it('Expect to Fail validation with different password', async () => {

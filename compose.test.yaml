@@ -8,11 +8,13 @@ services:
       - ./api/node_modules:/api/node_modules
     env_file:
       - ./.env.test
-    command: pnpm run test:watch
+    command: pnpm run test:e2e --watchAll
     depends_on:
       - dbtest
     networks:
       - test_network
+    ports:
+      - "3000:3000"
 
   dbtest:
     image: postgres:13.3-alpine

@@ -7,6 +7,8 @@ export const CONFIG = {
   isDev: process.env.NODE_ENV !== 'production',
   jwtSecret: process.env.JWT_SECRET,
   cookieSecret: process.env.COOKIES_SECRET,
+  redisHost: process.env.REDIS_HOST,
+  redisPort: parseInt(process.env.REDIS_PORT, 10),
 };
 
 export const DB_OPTIONS = {

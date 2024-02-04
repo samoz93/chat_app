@@ -1,9 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Scope, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CONFIG } from 'src/config';
 import { UserEntity } from 'src/entities/user.entity';
 
-@Injectable()
+@Injectable({
+  scope: Scope.TRANSIENT,
+})
 export class TokenService {
   private jwtService = new JwtService({
     secret: CONFIG.jwtSecret,
