@@ -1,14 +1,15 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/entities/user.entity';
 import { AuthPayload } from 'src/schema/graphql';
-import { createToken, sanitizeUser } from 'src/utils';
+import { TokenService, sanitizeUser } from 'src/utils';
 import { Repository } from 'typeorm';
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(UserEntity)
     private userEntity: Repository<UserEntity>,
+    private tokenService: TokenService,
   ) {}
 
   async validateUser(
@@ -20,7 +21,7 @@ export class AuthService {
     });
     if (user && user.password === pass) {
       const sanitizedUser = sanitizeUser(user);
-      const jwt = createToken(sanitizedUser);
+      const jwt = this.tokenService.createToken(sanitizedUser);
 
       return {
         refreshToken: jwt.refreshToken,
@@ -28,10 +29,5 @@ export class AuthService {
         user: sanitizedUser,
       };
     }
-
-    throw new HttpException(
-      'Invalid credentials, User not found or password is incorrect',
-      401,
-    );
   }
 }

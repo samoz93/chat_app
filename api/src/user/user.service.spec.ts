@@ -3,6 +3,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import * as _ from 'lodash';
 import { UserEntity } from 'src/entities/user.entity';
 import { MockUsers } from 'src/test_utils/constants';
+import { TokenServiceMockFactory } from 'src/test_utils/userService.mock';
+import { TokenService } from 'src/utils';
 import { Repository } from 'typeorm';
 import { UserService } from './user.service';
 
@@ -25,6 +27,10 @@ describe('UserService', () => {
             create: jest.fn(async (ent) => ent),
             save: jest.fn(async (ent) => ent),
           },
+        },
+        {
+          provide: TokenService,
+          useFactory: TokenServiceMockFactory,
         },
       ],
     }).compile();

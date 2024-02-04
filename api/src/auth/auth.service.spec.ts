@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UserEntity } from 'src/entities/user.entity';
 import { MockUsers } from 'src/test_utils/constants';
+import { TokenServiceMockFactory } from 'src/test_utils/userService.mock';
+import { TokenService } from 'src/utils';
 import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
 
@@ -18,6 +20,10 @@ describe('AuthService', () => {
           useValue: {
             findOneBy: jest.fn(async (id) => testUser),
           },
+        },
+        {
+          provide: TokenService,
+          useFactory: TokenServiceMockFactory,
         },
       ],
     }).compile();

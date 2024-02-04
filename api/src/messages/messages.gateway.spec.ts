@@ -1,4 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { TokenServiceMockFactory } from 'src/test_utils/userService.mock';
+import { TokenService } from 'src/utils';
 import { MessagesGateway } from './messages.gateway';
 
 describe('MessagesGateway', () => {
@@ -6,7 +8,13 @@ describe('MessagesGateway', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [MessagesGateway],
+      providers: [
+        MessagesGateway,
+        {
+          provide: TokenService,
+          useFactory: TokenServiceMockFactory,
+        },
+      ],
     }).compile();
 
     gateway = module.get<MessagesGateway>(MessagesGateway);

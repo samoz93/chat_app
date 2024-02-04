@@ -10,6 +10,7 @@ import { CONFIG } from './config';
 import { MessagesGateway } from './messages/messages.gateway';
 import { MessagesModule } from './messages/messages.module';
 import { UserModule } from './user/user.module';
+import { TokenService } from './utils';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { UserModule } from './user/user.module';
     UserModule,
     AuthModule,
     MessagesModule,
+    TokenService,
   ],
   controllers: [AppController],
   providers: [AppService, MessagesGateway],

@@ -1,3 +1,4 @@
+import { UnauthorizedException } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -11,13 +12,24 @@ import {
 import { remove } from 'lodash';
 import { Server, Socket } from 'socket.io';
 import { ServerToClientTypes } from 'src/types';
-import { SocketAuthMiddleWare } from './messages.guard';
+import { TokenService } from 'src/utils';
 
 @WebSocketGateway()
 export class MessagesGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor() {}
+  SocketAuthMiddleWare = async (socket: Socket, next) => {
+    try {
+      const user = await this.tokenService.validateToken(
+        socket.handshake.headers,
+      );
+      socket['user'] = user; // socket['user'] = socket.user = user
+      next();
+    } catch (error) {
+      next(new UnauthorizedException('Invalid token'));
+    }
+  };
+  constructor(private tokenService: TokenService) {}
   clients = [];
   @WebSocketServer()
   server: Server<any, ServerToClientTypes>;
@@ -33,7 +45,7 @@ export class MessagesGateway
   }
 
   afterInit(server: any) {
-    server.use(SocketAuthMiddleWare);
+    server.use(this.SocketAuthMiddleWare);
   }
 
   sendMessage(message: string) {

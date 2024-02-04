@@ -5,13 +5,16 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { validateToken } from '../utils';
+import { TokenService } from 'src/utils';
 
 @Injectable()
 export class MessagesGuard implements CanActivate {
+  constructor(private tokenService: TokenService) {}
   async canActivate(context: ExecutionContext) {
     const socket = context.switchToWs().getClient() as Socket;
-    const user = await validateToken(socket.handshake.headers);
+    const user = await this.tokenService.validateToken(
+      socket.handshake.headers,
+    );
 
     if (!user) {
       throw new UnauthorizedException('Invalid token');
@@ -20,13 +23,3 @@ export class MessagesGuard implements CanActivate {
     return true;
   }
 }
-
-export const SocketAuthMiddleWare = async (socket: Socket, next) => {
-  try {
-    const user = await validateToken(socket.handshake.headers);
-    socket['user'] = user; // socket['user'] = socket.user = user
-    next();
-  } catch (error) {
-    next(new UnauthorizedException('Invalid token'));
-  }
-};

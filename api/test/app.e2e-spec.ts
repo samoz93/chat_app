@@ -130,8 +130,6 @@ describe('GraphQl, Testing User functionalities', () => {
       })
       .expect(200)
       .expect((res) => {
-        console.log('res.body', res.body);
-
         expect(res.body.errors[0].message).toEqual('User already exists');
         expect(res.body.data).toBeNull();
       });

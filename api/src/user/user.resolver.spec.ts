@@ -1,6 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MockUsers } from 'src/test_utils/constants';
-import { UserServiceMockFactory } from 'src/test_utils/userService.mock';
+import {
+  TokenServiceMockFactory,
+  UserServiceMockFactory,
+} from 'src/test_utils/userService.mock';
+import { TokenService } from 'src/utils';
 import { UserResolver } from './user.resolver';
 import { UserService } from './user.service';
 
@@ -8,7 +12,14 @@ describe('UserResolver', () => {
   let resolver: UserResolver;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UserResolver, UserService],
+      providers: [
+        UserResolver,
+        UserService,
+        {
+          provide: TokenService,
+          useFactory: TokenServiceMockFactory,
+        },
+      ],
     })
       .overrideProvider(UserService)
       .useFactory({

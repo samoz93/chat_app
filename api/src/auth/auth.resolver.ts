@@ -5,7 +5,7 @@ import { HttpExceptionFilter } from 'src/http-exception-filter/http-exception-fi
 import { AuthPayload, NewUserInput } from 'src/schema/graphql';
 import { JWT_TOKEN, REFRESH_TOKEN } from 'src/types';
 import { UserService } from 'src/user/user.service';
-import { GraphResponse, createToken, validateRefreshToken } from 'src/utils';
+import { GraphResponse, TokenService } from 'src/utils';
 import { AuthService } from './auth.service';
 @Resolver('Auth')
 @UseFilters(new HttpExceptionFilter())
@@ -13,6 +13,7 @@ export class AuthResolver {
   constructor(
     private authService: AuthService,
     private userService: UserService,
+    private tokenService: TokenService,
   ) {}
 
   @Mutation('login')
@@ -23,6 +24,12 @@ export class AuthResolver {
   ): Promise<AuthPayload> {
     const authPayload = await this.authService.validateUser(email, password);
 
+    if (!authPayload) {
+      throw new HttpException(
+        'Invalid credentials, User not found or password is incorrect',
+        401,
+      );
+    }
     res.cookie(REFRESH_TOKEN, authPayload.refreshToken);
     res.cookie(JWT_TOKEN, authPayload.token);
 
@@ -43,7 +50,7 @@ export class AuthResolver {
     }
 
     const user = await this.userService.createUser(data);
-    const jwt = createToken(user);
+    const jwt = this.tokenService.createToken(user);
 
     res.cookie(REFRESH_TOKEN, jwt.refreshToken);
     res.cookie(JWT_TOKEN, jwt.token);
@@ -64,9 +71,9 @@ export class AuthResolver {
     if (!refreshToken) {
       throw new HttpException('Invalid refresh token', 401);
     }
-    const { id } = await validateRefreshToken(refreshToken);
+    const { id } = await this.tokenService.validateRefreshToken(refreshToken);
     const user = await this.userService.getUserById(id);
-    const jwt = createToken(user);
+    const jwt = this.tokenService.createToken(user);
 
     res.cookie(REFRESH_TOKEN, jwt.refreshToken);
     res.cookie(JWT_TOKEN, jwt.token);
