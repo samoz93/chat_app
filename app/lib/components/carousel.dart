@@ -1,5 +1,7 @@
 import 'package:app/helpers/carousel_item.dart';
 import 'package:app/pages/home_page.dart';
+import 'package:app/services/locator.dart';
+import 'package:app/services/socket.io.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -20,6 +22,7 @@ class _CarouselState extends State<Carousel> {
   var page = 0;
   final _ctrl =
       PageController(viewportFraction: 0.3, initialPage: 0, keepPage: true);
+  final _client = it.get<SocketService>();
 
   @override
   void initState() {
@@ -57,37 +60,42 @@ class _CarouselState extends State<Carousel> {
             padEnds: false,
             itemBuilder: (context, index) {
               final item = widget.items[index];
-              return Container(
-                padding: EdgeInsets.all(15.sp),
-                margin: EdgeInsets.only(right: 15.sp),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color.fromARGB(25, 0, 0, 0),
-                      Color.fromARGB(255, 0, 0, 0),
-                    ],
-                    stops: [
-                      0.5,
-                      1.0,
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    tileMode: TileMode.decal,
-                  ),
-                  borderRadius: BorderRadius.circular(
-                    20,
-                  ),
-                  image: DecorationImage(
-                    image: NetworkImage(
-                      item.image,
+              return TapRegion(
+                onTapInside: (event) => {
+                  _client.joinRoom(item.id),
+                },
+                child: Container(
+                  padding: EdgeInsets.all(15.sp),
+                  margin: EdgeInsets.only(right: 15.sp),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color.fromARGB(25, 0, 0, 0),
+                        Color.fromARGB(255, 0, 0, 0),
+                      ],
+                      stops: [
+                        0.5,
+                        1.0,
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      tileMode: TileMode.decal,
                     ),
-                    fit: BoxFit.cover,
-                    opacity: .6,
+                    borderRadius: BorderRadius.circular(
+                      20,
+                    ),
+                    image: DecorationImage(
+                      image: NetworkImage(
+                        item.image,
+                      ),
+                      fit: BoxFit.cover,
+                      opacity: .6,
+                    ),
                   ),
-                ),
-                child: Align(
-                  alignment: Alignment.bottomLeft,
-                  child: Text(item.title),
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text(item.title),
+                  ),
                 ),
               );
             },

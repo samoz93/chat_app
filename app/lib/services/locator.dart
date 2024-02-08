@@ -3,6 +3,7 @@ import 'package:app/services/graph_client.dart';
 import 'package:app/services/local_storage.dart';
 import 'package:app/services/socket.io.dart';
 import 'package:app/stores/auth_store.dart';
+import 'package:app/stores/rooms_store.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -28,26 +29,6 @@ Future<void> setup() async {
     dependsOn: [LocalStorage],
   );
 
-  // // // HTTP client, will depend on local storage and save token in header
-  // it.registerSingletonWithDependencies<Dio>(() {
-  //   return Dio(
-  //     BaseOptions(
-  //       baseUrl: Config.BASE_URL,
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //     ),
-  //   )..interceptors.add(
-  //       InterceptorsWrapper(
-  //         onRequest: (options, handler) {
-  //           options.headers['Authorization'] =
-  //               GetIt.I.get<LocalStorage>().token;
-  //           return handler.next(options);
-  //         },
-  //       ),
-  //     );
-  // }, dependsOn: [LocalStorage]);
-
   it.registerSingletonWithDependencies<GraphClient>(
     () => GraphClient(),
     dependsOn: [LocalStorage],
@@ -61,6 +42,11 @@ Future<void> setup() async {
   it.registerSingletonWithDependencies<AuthStore>(
     () => AuthStore(),
     dependsOn: [AuthRepo],
+  );
+
+  it.registerSingletonWithDependencies<RoomsStore>(
+    () => RoomsStore(),
+    dependsOn: [SocketService],
   );
 
   await it.allReady();

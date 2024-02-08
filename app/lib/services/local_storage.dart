@@ -29,6 +29,11 @@ class LocalStorage {
     return null;
   }
 
+  clearAuthData() async {
+    await _auth.delete(StorageKeys.token.toString());
+    await _usersBox.delete(StorageKeys.me.toString());
+  }
+
   getUserById(String id) {
     return _usersBox.get(id);
   }

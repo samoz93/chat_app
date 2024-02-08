@@ -10,7 +10,7 @@ export class TokenService {
   private jwtService = new JwtService({
     secret: CONFIG.jwtSecret,
     global: true,
-    signOptions: { expiresIn: '60m' },
+    signOptions: { expiresIn: '1d' },
   });
 
   private jwtRefreshService = new JwtService({

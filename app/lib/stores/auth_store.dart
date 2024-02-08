@@ -7,12 +7,12 @@ import 'package:mobx/mobx.dart';
 
 part 'auth_store.g.dart';
 
-class AuthStore = _AuthService with _$AuthStore;
+class AuthStore = _AuthStore with _$AuthStore;
 
-abstract class _AuthService with Store {
+abstract class _AuthStore with Store {
   final _repo = it.get<AuthRepo>();
 
-  _AuthService() {
+  _AuthStore() {
     token = _repo.token;
     me = _repo.me;
   }
@@ -61,7 +61,9 @@ abstract class _AuthService with Store {
   }
 
   @action
-  signout() {
+  signout() async {
+    await _repo.logout();
     me = null;
+    token = null;
   }
 }

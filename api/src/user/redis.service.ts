@@ -51,7 +51,12 @@ export class RedisService {
 
   // Keep track of online/offline users and their client ids
   async addUser(user: UserEntity, clientId: string) {
-    await this.redis.hSet(this.getUserInfoKey(user.id), user as any);
+    await this.redis.hSet(this.getUserInfoKey(user.id), {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      rooms: user.rooms?.join(',') ?? '',
+    });
     return await this.redis.hSet(USERS_COLLECTION, user.id, clientId);
   }
 
@@ -68,9 +73,12 @@ export class RedisService {
   }
 
   async getUserInfo(userId: string) {
-    return this.redis.hGetAll(
-      this.getUserInfoKey(userId),
-    ) as unknown as UserEntity;
+    const data = await this.redis.hGetAll(this.getUserInfoKey(userId));
+    const user = Object.assign(new UserEntity(), {
+      ...data,
+      rooms: data.rooms?.split(','),
+    });
+    return user;
   }
 
   // Keep track of room's members

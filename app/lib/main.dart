@@ -4,7 +4,6 @@ import 'package:app/pages/auth_page.dart';
 import 'package:app/pages/home_page.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/stores/auth_store.dart';
-import 'package:app/utils/prettyprint.dart';
 import 'package:app/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -35,7 +34,6 @@ class MyApp extends StatelessWidget {
     final authStore = it.get<AuthStore>();
 
     return ResponsiveSizer(builder: (context, or, screenType) {
-      prettyPrint("isLogg", authStore.isLoggedIn);
       return MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
@@ -64,7 +62,7 @@ class MyApp extends StatelessWidget {
             tertiary: const Color.fromARGB(255, 42, 105, 252),
           ),
         ),
-        home: const AuthPage(),
+        home: authStore.isLoggedIn ? const HomePage() : const AuthPage(),
         routes: {
           "/home": (context) => const HomePage(),
           "/auth": (context) => const AuthPage(),

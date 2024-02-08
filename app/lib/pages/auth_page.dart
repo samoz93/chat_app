@@ -6,10 +6,10 @@ import 'package:app/models/form_fields.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/stores/auth_store.dart';
 import 'package:app/utils/ShaderView.dart';
-import 'package:app/utils/prettyprint.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:widget_mask/widget_mask.dart';
 
 enum AuthMode {
   signIn,
@@ -94,13 +94,6 @@ class _AuthPageState extends State<AuthPage>
   }
 
   @override
-  void didUpdateWidget(covariant AuthPage oldWidget) {
-    // TODO: implement didUpdateWidget
-    super.didUpdateWidget(oldWidget);
-    prettyPrint("didUpdateWidget");
-  }
-
-  @override
   void dispose() {
     _ticker.dispose();
     super.dispose();
@@ -124,12 +117,7 @@ class _AuthPageState extends State<AuthPage>
             return Text("Error: ${snapshot.error}");
           }
           final shader = snapshot.data!;
-          return CustomPaint(
-            painter: ShaderPainter(
-              shader: shader,
-              repaint: _val,
-            ),
-            child: BackdropFilter(
+          return BackdropFilter(
               key: _keyAll,
               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
               child: Container(
@@ -143,13 +131,29 @@ class _AuthPageState extends State<AuthPage>
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          ClipRRect(
-                            borderRadius:
-                                BorderRadius.all(Radius.elliptical(40.h, 50.w)),
-                            child: Image.network(
-                              "https://icones.pro/wp-content/uploads/2021/05/icone-de-chat-violet.png",
-                              height: 30.h,
-                              fit: BoxFit.cover,
+                          SizedBox(
+                            height: 30.h,
+                            child: WidgetMask(
+                              mask: CustomPaint(
+                                painter: ShaderPainter(
+                                  shader: shader,
+                                  repaint: _val,
+                                ),
+                              ),
+                              childSaveLayer: true,
+                              blendMode: BlendMode.srcIn,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(15.h),
+                                child: Container(
+                                  margin: EdgeInsets.only(
+                                    top: 20.sp,
+                                  ),
+                                  child: Image.network(
+                                    "https://icones.pro/wp-content/uploads/2021/05/icone-de-chat-violet.png",
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                           Column(
@@ -211,9 +215,7 @@ class _AuthPageState extends State<AuthPage>
                     ),
                   ),
                 ),
-              ),
-            ),
-          );
+              ));
         },
       ),
     );

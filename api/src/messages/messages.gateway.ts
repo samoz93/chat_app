@@ -1,3 +1,4 @@
+import { UnauthorizedException } from '@nestjs/common';
 import {
   ConnectedSocket,
   MessageBody,
@@ -20,22 +21,17 @@ export class MessagesGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   SocketAuthMiddleWare = async (socket: Socket, next) => {
-    socket['user'] = {
-      id: '123',
-      name: Math.random() * 100 + '',
-      email: 'asda',
-    }; // socket['user'] = socket.user = user
-    next();
+    try {
+      const user = await this.tokenService.validateToken(
+        socket.handshake.headers,
+      );
+      socket['user'] = user; // socket['user'] = socket.user = user
+      next();
+    } catch (error) {
+      console.log('error', error);
 
-    // try {
-    //   const user = await this.tokenService.validateToken(
-    //     socket.handshake.headers,
-    //   );
-    //   socket['user'] = user; // socket['user'] = socket.user = user
-    //   next();
-    // } catch (error) {
-    //   next(new UnauthorizedException('Invalid token'));
-    // }
+      next(new UnauthorizedException('Invalid token'));
+    }
   };
   constructor(
     private tokenService: TokenService,
@@ -47,7 +43,7 @@ export class MessagesGateway
   server: Server<ServerToClientTypes, ServerToClientTypes>;
 
   async handleDisconnect(@ConnectedSocket() client: SocketWithUser) {
-    await this.redis.removeUser(client['user'].id);
+    await this.redis.removeUser(client.user.id);
   }
 
   async handleConnection(@ConnectedSocket() client: SocketWithUser) {
@@ -64,6 +60,8 @@ export class MessagesGateway
     @MessageBody() room: string,
     @ConnectedSocket() client: SocketWithUser,
   ): string {
+    console.log('join', room, client.id, client.user.id);
+
     this.roomService.join(room, client);
     return 'joined';
   }
@@ -73,6 +71,8 @@ export class MessagesGateway
     @MessageBody() room: string,
     @ConnectedSocket() client: SocketWithUser,
   ): string {
+    console.log('leave', room, client.id, client.user.id);
+
     return this.roomService.leave(room, client);
   }
 

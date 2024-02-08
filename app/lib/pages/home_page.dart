@@ -4,34 +4,40 @@ import 'package:app/helpers/carousel_item.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/services/socket.io.dart';
 import 'package:app/stores/auth_store.dart';
+import 'package:app/stores/rooms_store.dart';
 import 'package:app/utils/extensions.dart';
-import 'package:app/utils/prettyprint.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 final items = [
   CarouselItem(
-      title: "Mia Khalifa",
+      title: "SomeOther",
+      id: "room1",
       image:
           "https://cdn.pixabay.com/photo/2016/12/27/06/38/albert-einstein-1933340_1280.jpg",
       isLiked: true),
   CarouselItem(
       title: "Hi",
+      id: "room1",
       image:
           "https://cdn.pixabay.com/photo/2016/12/27/06/38/albert-einstein-1933340_1280.jpg",
       isLiked: true),
   CarouselItem(
       title: "Hi",
+      id: "room1",
       image:
           "https://cdn.pixabay.com/photo/2016/12/27/06/38/albert-einstein-1933340_1280.jpg",
       isLiked: true),
   CarouselItem(
       title: "Hi",
+      id: "room1",
       image:
           "https://cdn.pixabay.com/photo/2016/12/27/06/38/albert-einstein-1933340_1280.jpg",
       isLiked: true),
   CarouselItem(
       title: "Hi",
+      id: "room1",
       image:
           "https://cdn.pixabay.com/photo/2016/12/27/06/38/albert-einstein-1933340_1280.jpg",
       isLiked: true),
@@ -47,6 +53,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _store = it.get<AuthStore>();
   final _io = it.get<SocketService>();
+  final _rooms = it.get<RoomsStore>();
 
   Widget get _spacer => SizedBox(height: 15.sp);
   @override
@@ -54,7 +61,6 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
     _io.init();
-    prettyPrint('init');
   }
 
   @override
@@ -76,6 +82,20 @@ class _HomePageState extends State<HomePage> {
                   title: "Favourite",
                 ),
               ),
+              Observer(
+                builder: (context) {
+                  return Column(
+                    children: _rooms.rooms.entries
+                        .map((e) => Column(
+                              children: [
+                                Text(e.key),
+                                ...e.value.map((e) => Text(e.name))
+                              ],
+                            ))
+                        .toList(),
+                  );
+                },
+              )
             ],
           ),
         ),
@@ -113,7 +133,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
             onPressed: () {
-              _io.connect();
+              _store.signout();
             },
             child: const Icon(Icons.add),
           ),

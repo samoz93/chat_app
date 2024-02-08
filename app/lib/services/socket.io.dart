@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:app/constants/config.dart';
+import 'package:app/models/message_dto.dart';
+import 'package:app/models/room_events_dto.dart';
 import 'package:app/services/local_storage.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/utils/prettyprint.dart';
@@ -9,13 +13,18 @@ const List EVENTS = [];
 class SocketService {
   final storage = it.get<LocalStorage>();
 
+  final _message_controller = StreamController<MessageDto>.broadcast();
+  final _room_controller = StreamController<RoomsEventsDto>.broadcast();
+
+  get message_stream => _message_controller.stream;
+  Stream<RoomsEventsDto> get room_stream => _room_controller.stream;
+
   SocketService();
 
   IO.Socket? socket;
   final token = it.get<LocalStorage>().token;
 
   void init() async {
-    prettyPrint('token: $token');
     socket = IO.io(
       Config.BASE_URL,
       IO.OptionBuilder().setTransports(['websocket']).setExtraHeaders({
@@ -25,11 +34,6 @@ class SocketService {
     _setListener();
   }
 
-  void connect() {
-    socket?.connect();
-    // _setListener(socket.connect());
-  }
-
   sendMessage(String event, dynamic data) {
     final msg = {
       "user": storage.me?.id,
@@ -37,15 +41,21 @@ class SocketService {
       "data": data,
     };
 
-    socket?.emitWithAck("event", msg, ack: (data) {
-      prettyPrint('ack data: $data');
-    }, binary: false);
+    socket?.emitWithAck("event", msg, ack: (data) {}, binary: false);
   }
+
+  var _toggle = false;
 
   _setListener() {
     socket?.on("newMessage", (data) {
       prettyPrint('new message $data');
     });
+
+    socket?.on("roomEvents", (data) {
+      var event = RoomsEventsDto.fromJson(data);
+      _room_controller.add(event);
+    });
+
     socket?.onConnect((data) {
       prettyPrint('connected $data');
     });
@@ -76,6 +86,22 @@ class SocketService {
     socket?.onReconnectFailed((data) {
       prettyPrint('reconnect failed $data');
     });
+  }
+
+  joinRoom(String roomId) {
+    if (_toggle) {
+      return leaveRoom(roomId);
+    }
+    socket?.emit("join", roomId);
+    _toggle = !_toggle;
+  }
+
+  leaveRoom(String roomId) {
+    if (!_toggle) {
+      return joinRoom(roomId);
+    }
+    socket?.emit("leave", roomId);
+    _toggle = !_toggle;
   }
 
   destroy() {

@@ -59,4 +59,8 @@ class AuthRepo {
 
     return data;
   }
+
+  Future<void> logout() async {
+    await _localStorage.clearAuthData();
+  }
 }
