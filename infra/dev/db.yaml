@@ -21,7 +21,13 @@ spec:
           envFrom:
             - configMapRef:
                 name: chat-config
-
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-pv-claim
+      volumes:
+        - name: postgres-pv-claim
+          persistentVolumeClaim:
+            claimName: pv-claim
 ---
 apiVersion: v1
 kind: Service

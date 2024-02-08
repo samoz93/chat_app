@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { CONFIG } from './config';
 import { MessagesGateway } from './messages/messages.gateway';
 import { MessagesModule } from './messages/messages.module';
+import { RoomClientService } from './messages/room.client/room.client.service';
 import { SharedModule } from './shared/shared.module';
 import { UserModule } from './user/user.module';
 
@@ -52,6 +53,6 @@ import { UserModule } from './user/user.module';
     SharedModule,
   ],
   controllers: [AppController],
-  providers: [AppService, MessagesGateway],
+  providers: [AppService, MessagesGateway, RoomClientService],
 })
 export class AppModule {}

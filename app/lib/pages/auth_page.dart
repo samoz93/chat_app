@@ -1,7 +1,12 @@
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:app/components/custom_input.dart';
 import 'package:app/models/form_fields.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/stores/auth_store.dart';
+import 'package:app/utils/ShaderView.dart';
+import 'package:app/utils/prettyprint.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -18,7 +23,8 @@ class AuthPage extends StatefulWidget {
   State<AuthPage> createState() => _AuthPageState();
 }
 
-class _AuthPageState extends State<AuthPage> {
+class _AuthPageState extends State<AuthPage>
+    with SingleTickerProviderStateMixin {
   showErrorMessage(err) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -65,6 +71,42 @@ class _AuthPageState extends State<AuthPage> {
     Navigator.pushNamed(context, "/home");
   }
 
+  FragmentShader? shader;
+  Future<FragmentShader> getShader() async {
+    final frag = await FragmentProgram.fromAsset("shaders/fragment.frag");
+    shader = frag.fragmentShader();
+    return shader!;
+  }
+
+  final _val = ValueNotifier(0.0);
+  var _ticker;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _ticker ??= createTicker((elapsed) {
+      final double elapsedSeconds = elapsed.inMilliseconds / 1000;
+      shader?.setFloat(0, elapsedSeconds);
+      _val.value = elapsedSeconds;
+    });
+    if (_ticker.isActive) _ticker.stop();
+    _ticker.start();
+  }
+
+  @override
+  void didUpdateWidget(covariant AuthPage oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
+    prettyPrint("didUpdateWidget");
+  }
+
+  @override
+  void dispose() {
+    _ticker.dispose();
+    super.dispose();
+  }
+
+  final _keyAll = UniqueKey();
   @override
   Widget build(BuildContext context) {
     final inputs = mode == AuthMode.signIn
@@ -72,82 +114,107 @@ class _AuthPageState extends State<AuthPage> {
         : [emailField, nameField, passwordField, confirmPasswordField];
 
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SingleChildScrollView(
-              child: Form(
-                key: _key,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ClipRRect(
-                      borderRadius:
-                          BorderRadius.all(Radius.elliptical(40.h, 50.w)),
-                      child: Image.network(
-                        "https://icones.pro/wp-content/uploads/2021/05/icone-de-chat-violet.png",
-                        height: 30.h,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    Column(
-                      key: _refreshKey,
-                      children: [
-                        ...inputs.map(
-                          (e) {
-                            return Container(
-                              margin: const EdgeInsets.symmetric(vertical: 8),
-                              child: CustomInput(
-                                label: e.label,
-                                validator: e.validator,
-                                onChanged: (value) {
-                                  e.value = value;
-                                },
-                                prefixIcon: Icons.email,
-                              ),
-                            );
-                          },
-                        ),
-                      ]
-                          .animate(
-                            interval: .1.seconds,
-                          )
-                          .shakeX(),
-                    ),
-                    SizedBox(
+      body: FutureBuilder<FragmentShader>(
+        future: getShader(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          }
+          if (snapshot.hasError) {
+            return Text("Error: ${snapshot.error}");
+          }
+          final shader = snapshot.data!;
+          return CustomPaint(
+            painter: ShaderPainter(
+              shader: shader,
+              repaint: _val,
+            ),
+            child: BackdropFilter(
+              key: _keyAll,
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                color:
+                    Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Form(
+                      key: _key,
                       child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          ElevatedButton(
-                            onPressed: submit,
-                            child: Text(
-                              mode == AuthMode.signIn ? "Sign In" : "Sign Up",
+                          ClipRRect(
+                            borderRadius:
+                                BorderRadius.all(Radius.elliptical(40.h, 50.w)),
+                            child: Image.network(
+                              "https://icones.pro/wp-content/uploads/2021/05/icone-de-chat-violet.png",
+                              height: 30.h,
+                              fit: BoxFit.cover,
                             ),
                           ),
-                          TextButton(
-                            onPressed: () {
-                              setState(() {
-                                _refreshKey = UniqueKey();
-                                mode = mode == AuthMode.signIn
-                                    ? AuthMode.signUp
-                                    : AuthMode.signIn;
-                              });
-                            },
-                            child: Text(
-                              mode == AuthMode.signIn
-                                  ? "Don't have an account? Sign Up"
-                                  : "Already have an account? Sign In",
-                            ),
+                          Column(
+                            key: _refreshKey,
+                            children: [
+                              ...inputs.map(
+                                (e) {
+                                  return Container(
+                                    margin:
+                                        const EdgeInsets.symmetric(vertical: 8),
+                                    child: CustomInput(
+                                      label: e.label,
+                                      validator: e.validator,
+                                      onChanged: (value) {
+                                        e.value = value;
+                                      },
+                                      prefixIcon: Icons.email,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ]
+                                .animate(
+                                  interval: .1.seconds,
+                                )
+                                .shakeX(),
                           ),
+                          SizedBox(
+                            child: Column(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: submit,
+                                  child: Text(
+                                    mode == AuthMode.signIn
+                                        ? "Sign In"
+                                        : "Sign Up",
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _refreshKey = UniqueKey();
+                                      mode = mode == AuthMode.signIn
+                                          ? AuthMode.signUp
+                                          : AuthMode.signIn;
+                                    });
+                                  },
+                                  child: Text(
+                                    mode == AuthMode.signIn
+                                        ? "Don't have an account? Sign Up"
+                                        : "Already have an account? Sign In",
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
                         ],
                       ),
-                    )
-                  ],
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

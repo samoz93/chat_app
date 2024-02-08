@@ -2,17 +2,29 @@ allow_k8s_contexts( "docker-desktop");
 k8s_context('docker-desktop')
 k8s_namespace("chat-app")
 
-
-
-k8s_yaml(listdir ( "./infra/dev" , recursive = True ) )
+k8s_yaml([file for file in listdir( "./infra/dev" , recursive = True ) if file.endswith('.yaml')])
+# k8s_resource('rabbitmq-depl', port_forwards=3001)
+k8s_resource("api-deployment", port_forwards=3000)
 
 docker_build('samoz93/chat-api', 'api',
     build_args={'node_env': 'development'},
     target="development",
     entrypoint="npm run start:dev",
-    ignore="*.spec",
+    ignore="**/*.spec",
     live_update=[
         sync('./api', '/api'),
+        
+        run('cd /api && pnpm i', trigger=['./api/package.json']),
+])
+
+
+docker_build('samoz93/chat-api/room-micro-service', 'room-api/',
+    build_args={'node_env': 'development'},
+    target="production",
+    entrypoint="npm run start",
+    ignore="*.spec",
+    live_update=[
+        sync('./room-api/', '/api'),
         
         run('cd /api && pnpm i', trigger=['./api/package.json']),
 ])

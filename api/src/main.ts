@@ -4,7 +4,7 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { CONFIG } from './config';
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {});
   app.use(cookieParser(CONFIG.cookieSecret));
   app.enableCors({
     origin: CONFIG.isDev ? '*' : 'localhost:3000',
@@ -30,6 +30,11 @@ async function bootstrap() {
   //     },
   //   }),
   // );
+  // app.connectMicroservice({
+  //   options: {
+  //     urls: ['amqp://rabbitmq-srv:5672'],
+  //   },
+  // });
   await app.listen(3000);
 }
 bootstrap();

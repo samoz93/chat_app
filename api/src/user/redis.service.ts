@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { RedisClientType, createClient } from 'redis';
 import { CONFIG } from 'src/config';
+import { UserEntity } from 'src/entities/user.entity';
 
 const USERS_COLLECTION = 'users';
 @Injectable()
@@ -12,7 +13,6 @@ export class RedisService {
     this.redis = createClient({
       url: `redis://${CONFIG.redisHost}:${CONFIG.redisPort}`,
     });
-
     return new Promise((resolve, reject) => {
       this.redis
         .on('connect', () => {
@@ -24,31 +24,74 @@ export class RedisService {
         .connect();
     });
   }
+  private getRoomKey(room: string) {
+    return `room:${room}`;
+  }
 
-  async addUser(userId: string, clientId: string) {
-    return await this.redis.hSet(USERS_COLLECTION, userId, clientId);
+  private getUserRoomsKey(userId: string) {
+    return `user_rooms:${userId}`;
+  }
+
+  private getUserInfoKey(userId: string): string {
+    return `user_info:${userId}`;
+  }
+
+  // Add and remove rooms form/to user
+  async addRoomToUser(userId: string, room: string) {
+    return await this.redis.sAdd(this.getUserRoomsKey(userId), room);
+  }
+
+  async removeRoomFromUser(userId: string, room: string) {
+    return await this.redis.sRem(this.getUserRoomsKey(userId), room);
+  }
+
+  async getUserRooms(userId: string) {
+    return await this.redis.sMembers(this.getUserRoomsKey(userId));
+  }
+
+  // Keep track of online/offline users and their client ids
+  async addUser(user: UserEntity, clientId: string) {
+    await this.redis.hSet(this.getUserInfoKey(user.id), user as any);
+    return await this.redis.hSet(USERS_COLLECTION, user.id, clientId);
+  }
+
+  async removeUser(userId: string) {
+    return await this.redis.hDel(USERS_COLLECTION, userId);
   }
 
   async userExists(userId: string) {
     return this.redis.hExists(USERS_COLLECTION, userId);
   }
 
-  getUserClientId(userId: string) {
+  async getUserClientId(userId: string) {
     return this.redis.hGet(USERS_COLLECTION, userId);
   }
 
-  addToRoom(room: string, userId: string) {
-    return this.redis.lPush(room, userId);
+  async getUserInfo(userId: string) {
+    return this.redis.hGetAll(
+      this.getUserInfoKey(userId),
+    ) as unknown as UserEntity;
   }
 
-  removeFromRoom(room: string, userId: string) {
-    return this.redis.lRem(room, 0, userId);
+  // Keep track of room's members
+  async addUserToRoom(room: string, userId: string) {
+    return this.redis.sAdd(this.getRoomKey(room), userId);
   }
 
-  getRoomMembers(room: string) {
-    return this.redis.lRange(room, 0, -1);
+  removeUserFromRoom(room: string, userId: string) {
+    return this.redis.sRem(this.getRoomKey(room), userId);
   }
 
+  async getRoomMembers(room: string): Promise<UserEntity[]> {
+    const userIDS = await this.redis.sMembers(this.getRoomKey(room));
+    const users = [];
+    for await (const userId of userIDS) {
+      users.push(await this.getUserInfo(userId));
+    }
+    return users;
+  }
+
+  // For testing TODO: remove later
   async getAllUsers() {
     const g = await this.redis.hGetAll(USERS_COLLECTION);
     return g;

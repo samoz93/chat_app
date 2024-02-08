@@ -5,6 +5,7 @@ import { TokenService } from 'src/utils';
 @Module({
   providers: [
     TokenService,
+
     {
       provide: RedisService,
       useFactory: async () => {

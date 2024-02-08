@@ -8,11 +8,12 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { remove } from 'lodash';
 import { Server, Socket } from 'socket.io';
 import { IoMessage, ServerToClientTypes } from 'src/types';
 import { RedisService } from 'src/user/redis.service';
 import { TokenService } from 'src/utils';
+import { RoomClientService } from './room.client/room.client.service';
+import { SocketWithUser } from './types';
 
 @WebSocketGateway()
 export class MessagesGateway
@@ -20,8 +21,8 @@ export class MessagesGateway
 {
   SocketAuthMiddleWare = async (socket: Socket, next) => {
     socket['user'] = {
-      id: 'asda',
-      name: 'asda',
+      id: '123',
+      name: Math.random() * 100 + '',
       email: 'asda',
     }; // socket['user'] = socket.user = user
     next();
@@ -39,70 +40,55 @@ export class MessagesGateway
   constructor(
     private tokenService: TokenService,
     private redis: RedisService,
+    private roomService: RoomClientService,
   ) {}
   clients = [];
   @WebSocketServer()
-  server: Server<any, ServerToClientTypes>;
+  server: Server<ServerToClientTypes, ServerToClientTypes>;
 
-  async handleDisconnect(client: any) {
-    const user = client['user'];
-
-    this.clients = remove(this.clients, (c) => c === client.id);
+  async handleDisconnect(@ConnectedSocket() client: SocketWithUser) {
+    await this.redis.removeUser(client['user'].id);
   }
 
-  async handleConnection(client: Socket, args: any[]) {
-    const user = client['user'];
-    this.redis.addUser(user.id, client.id);
+  async handleConnection(@ConnectedSocket() client: SocketWithUser) {
+    await this.redis.addUser(client.user, client.id);
   }
 
   afterInit(server: any) {
+    RoomClientService.server = server;
     server.use(this.SocketAuthMiddleWare);
   }
 
   @SubscribeMessage('join')
   handleJoin(
     @MessageBody() room: string,
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: SocketWithUser,
   ): string {
-    client.join(room);
-    this.redis.addToRoom(room, client['user'].id);
-    this.server.to(room).emit('newMessage', {
-      message: `${client['user'].name} joined the room`,
-      sender: 'admin',
-      receiver: room,
-    });
-    // TODO: update redist to include this to the user
-    return `Joined ${room}`;
+    this.roomService.join(room, client);
+    return 'joined';
   }
 
   @SubscribeMessage('leave')
   handleLeave(
     @MessageBody() room: string,
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: SocketWithUser,
   ): string {
-    client.leave(room);
-    this.redis.removeFromRoom(room, client['user'].id);
-    this.server.to(room).emit('newMessage', {
-      message: `${client['user'].name} left the room`,
-      sender: 'admin',
-      receiver: room,
-    });
-    return `Left ${room}`;
+    return this.roomService.leave(room, client);
   }
 
   private sendMessageToRoom(room: string, message: IoMessage) {
     this.server.to(room).emit('newMessage', message);
   }
+
   @SubscribeMessage('message')
   async handleMessage(
     @MessageBody()
     message: IoMessage,
   ): Promise<string> {
-    // TODO: maybe we should store this in mongo ?
     if (message.room) {
       this.sendMessageToRoom(message.room, message);
     } else {
-      const socketId = await this.redis.getUserClientId(message.receiver);
+      const socketId = await this.redis.getUserClientId(message.receiver + '');
       this.server.to(socketId).emit('newMessage', message);
     }
     return 'message sent';
