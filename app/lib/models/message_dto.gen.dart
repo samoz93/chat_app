@@ -8,29 +8,34 @@ part of 'message_dto.dart';
 class _$MessageDtoImpl extends MessageDto {
   _$MessageDtoImpl({
     required this.message,
+    this.room,
     required this.sender,
     required this.receiver,
-    this.room,
+    required this.createdAt,
   }) : super.ctor();
 
   @override
   final String message;
 
   @override
-  final String sender;
+  final String? room;
+
+  @override
+  final User sender;
 
   @override
   final String receiver;
 
   @override
-  final String? room;
+  final int createdAt;
 
   factory _$MessageDtoImpl.fromJson(Map<dynamic, dynamic> json) {
     return _$MessageDtoImpl(
       message: json['message'] as String,
-      sender: json['sender'] as String,
-      receiver: json['receiver'] as String,
       room: json['room'] as String?,
+      sender: User.fromJson(json['sender']),
+      receiver: json['receiver'] as String,
+      createdAt: (json['createdAt'] as num).toInt(),
     );
   }
 
@@ -38,9 +43,10 @@ class _$MessageDtoImpl extends MessageDto {
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'message': message,
-      'sender': sender,
-      'receiver': receiver,
       'room': room,
+      'sender': sender.toJson(),
+      'receiver': receiver,
+      'createdAt': createdAt,
     };
   }
 
@@ -50,9 +56,10 @@ class _$MessageDtoImpl extends MessageDto {
         other is MessageDto &&
             runtimeType == other.runtimeType &&
             message == other.message &&
+            room == other.room &&
             sender == other.sender &&
             receiver == other.receiver &&
-            room == other.room;
+            createdAt == other.createdAt;
   }
 
   @override
@@ -60,9 +67,10 @@ class _$MessageDtoImpl extends MessageDto {
     return Object.hashAll(<Object?>[
       runtimeType,
       message,
+      room,
       sender,
       receiver,
-      room,
+      createdAt,
     ]);
   }
 
@@ -71,7 +79,7 @@ class _$MessageDtoImpl extends MessageDto {
     String toStringOutput = 'MessageDto{<optimized out>}';
     assert(() {
       toStringOutput =
-          'MessageDto@<$hexIdentity>{message: $message, sender: $sender, receiver: $receiver, room: $room}';
+          'MessageDto@<$hexIdentity>{message: $message, room: $room, sender: $sender, receiver: $receiver, createdAt: $createdAt}';
       return true;
     }());
     return toStringOutput;
@@ -84,17 +92,20 @@ class _$MessageDtoImpl extends MessageDto {
 abstract interface class _MessageDtoCopyWithProxy {
   MessageDto message(String newValue);
 
-  MessageDto sender(String newValue);
+  MessageDto room(String? newValue);
+
+  $UserCopyWithProxyChain<MessageDto> get sender;
 
   MessageDto receiver(String newValue);
 
-  MessageDto room(String? newValue);
+  MessageDto createdAt(int newValue);
 
   MessageDto call({
     final String? message,
-    final String? sender,
-    final String? receiver,
     final String? room,
+    final User? sender,
+    final String? receiver,
+    final int? createdAt,
   });
 }
 
@@ -109,7 +120,13 @@ class _MessageDtoCopyWithProxyImpl implements _MessageDtoCopyWithProxy {
 
   @pragma('vm:prefer-inline')
   @override
-  MessageDto sender(String newValue) => this(sender: newValue);
+  MessageDto room(String? newValue) => this(room: newValue);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $UserCopyWithProxyChain<MessageDto> get sender =>
+      $UserCopyWithProxyChain<MessageDto>(
+          _value.sender, (User update) => this(sender: update));
 
   @pragma('vm:prefer-inline')
   @override
@@ -117,21 +134,23 @@ class _MessageDtoCopyWithProxyImpl implements _MessageDtoCopyWithProxy {
 
   @pragma('vm:prefer-inline')
   @override
-  MessageDto room(String? newValue) => this(room: newValue);
+  MessageDto createdAt(int newValue) => this(createdAt: newValue);
 
   @pragma('vm:prefer-inline')
   @override
   MessageDto call({
     final String? message,
-    final String? sender,
-    final String? receiver,
     final Object? room = const Object(),
+    final User? sender,
+    final String? receiver,
+    final int? createdAt,
   }) {
     return _$MessageDtoImpl(
       message: message ?? _value.message,
+      room: identical(room, const Object()) ? _value.room : (room as String?),
       sender: sender ?? _value.sender,
       receiver: receiver ?? _value.receiver,
-      room: identical(room, const Object()) ? _value.room : (room as String?),
+      createdAt: createdAt ?? _value.createdAt,
     );
   }
 }
@@ -143,17 +162,20 @@ sealed class $MessageDtoCopyWithProxyChain<$Result> {
 
   $Result message(String newValue);
 
-  $Result sender(String newValue);
+  $Result room(String? newValue);
+
+  $Result sender(User newValue);
 
   $Result receiver(String newValue);
 
-  $Result room(String? newValue);
+  $Result createdAt(int newValue);
 
   $Result call({
     final String? message,
-    final String? sender,
-    final String? receiver,
     final String? room,
+    final User? sender,
+    final String? receiver,
+    final int? createdAt,
   });
 }
 
@@ -170,7 +192,11 @@ class _MessageDtoCopyWithProxyChainImpl<$Result>
 
   @pragma('vm:prefer-inline')
   @override
-  $Result sender(String newValue) => this(sender: newValue);
+  $Result room(String? newValue) => this(room: newValue);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Result sender(User newValue) => this(sender: newValue);
 
   @pragma('vm:prefer-inline')
   @override
@@ -178,21 +204,23 @@ class _MessageDtoCopyWithProxyChainImpl<$Result>
 
   @pragma('vm:prefer-inline')
   @override
-  $Result room(String? newValue) => this(room: newValue);
+  $Result createdAt(int newValue) => this(createdAt: newValue);
 
   @pragma('vm:prefer-inline')
   @override
   $Result call({
     final String? message,
-    final String? sender,
-    final String? receiver,
     final Object? room = const Object(),
+    final User? sender,
+    final String? receiver,
+    final int? createdAt,
   }) {
     return _chain(_$MessageDtoImpl(
       message: message ?? _value.message,
+      room: identical(room, const Object()) ? _value.room : (room as String?),
       sender: sender ?? _value.sender,
       receiver: receiver ?? _value.receiver,
-      room: identical(room, const Object()) ? _value.room : (room as String?),
+      createdAt: createdAt ?? _value.createdAt,
     ));
   }
 }

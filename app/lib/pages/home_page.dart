@@ -19,7 +19,7 @@ final items = [
       isLiked: true),
   CarouselItem(
       title: "Hi",
-      id: "room1",
+      id: "room2",
       image:
           "https://cdn.pixabay.com/photo/2016/12/27/06/38/albert-einstein-1933340_1280.jpg",
       isLiked: true),
@@ -45,6 +45,7 @@ final items = [
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
+  static const route = "/home";
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -112,12 +113,7 @@ class _HomePageState extends State<HomePage> {
           flex: 4,
           child: CustomInput(
             label: "Search",
-            onChanged: (v) {
-              _io.sendMessage("event", v);
-            },
-            onSuffixClicked: () {
-              _io.destroy();
-            },
+            onChanged: (v) {},
             suffixIcon: Icons.search,
           ),
         ),

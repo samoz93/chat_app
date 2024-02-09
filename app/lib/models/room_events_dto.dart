@@ -1,4 +1,3 @@
-import 'package:app/models/rooms_events_enum.dart';
 import 'package:app/models/user_dto.dart';
 import 'package:data_class_plugin/data_class_plugin.dart';
 
@@ -16,13 +15,13 @@ abstract class RoomsEventsDto {
   /// Default constructor
   factory RoomsEventsDto({
     required String room,
-    required User user,
+    required List<User> users,
     required String type,
   }) = _$RoomsEventsDtoImpl;
 
   String get room;
 
-  User get user;
+  List<User> get users;
 
   String get type;
 

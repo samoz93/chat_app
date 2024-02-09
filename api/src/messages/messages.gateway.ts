@@ -28,8 +28,6 @@ export class MessagesGateway
       socket['user'] = user; // socket['user'] = socket.user = user
       next();
     } catch (error) {
-      console.log('error', error);
-
       next(new UnauthorizedException('Invalid token'));
     }
   };
@@ -60,8 +58,6 @@ export class MessagesGateway
     @MessageBody() room: string,
     @ConnectedSocket() client: SocketWithUser,
   ): string {
-    console.log('join', room, client.id, client.user.id);
-
     this.roomService.join(room, client);
     return 'joined';
   }
@@ -70,14 +66,8 @@ export class MessagesGateway
   handleLeave(
     @MessageBody() room: string,
     @ConnectedSocket() client: SocketWithUser,
-  ): string {
-    console.log('leave', room, client.id, client.user.id);
-
+  ) {
     return this.roomService.leave(room, client);
-  }
-
-  private sendMessageToRoom(room: string, message: IoMessage) {
-    this.server.to(room).emit('newMessage', message);
   }
 
   @SubscribeMessage('message')
@@ -86,7 +76,7 @@ export class MessagesGateway
     message: IoMessage,
   ): Promise<string> {
     if (message.room) {
-      this.sendMessageToRoom(message.room, message);
+      this.roomService.sendMessage(this.server.to(message.room), message);
     } else {
       const socketId = await this.redis.getUserClientId(message.receiver + '');
       this.server.to(socketId).emit('newMessage', message);

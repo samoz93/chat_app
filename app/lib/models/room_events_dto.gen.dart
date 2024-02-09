@@ -8,15 +8,17 @@ part of 'room_events_dto.dart';
 class _$RoomsEventsDtoImpl extends RoomsEventsDto {
   _$RoomsEventsDtoImpl({
     required this.room,
-    required this.user,
+    required List<User> users,
     required this.type,
-  }) : super.ctor();
+  })  : _users = users,
+        super.ctor();
 
   @override
   final String room;
 
   @override
-  final User user;
+  List<User> get users => List<User>.unmodifiable(_users);
+  final List<User> _users;
 
   @override
   final String type;
@@ -24,7 +26,10 @@ class _$RoomsEventsDtoImpl extends RoomsEventsDto {
   factory _$RoomsEventsDtoImpl.fromJson(Map<dynamic, dynamic> json) {
     return _$RoomsEventsDtoImpl(
       room: json['room'] as String,
-      user: User.fromJson(json['user']),
+      users: <User>[
+        for (final dynamic i0 in (json['users'] as List<dynamic>))
+          User.fromJson(i0),
+      ],
       type: json['type'] as String,
     );
   }
@@ -33,7 +38,9 @@ class _$RoomsEventsDtoImpl extends RoomsEventsDto {
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'room': room,
-      'user': user.toJson(),
+      'users': <dynamic>[
+        for (final User i0 in users) i0.toJson(),
+      ],
       'type': type,
     };
   }
@@ -44,7 +51,7 @@ class _$RoomsEventsDtoImpl extends RoomsEventsDto {
         other is RoomsEventsDto &&
             runtimeType == other.runtimeType &&
             room == other.room &&
-            user == other.user &&
+            deepEquality(users, other.users) &&
             type == other.type;
   }
 
@@ -53,7 +60,6 @@ class _$RoomsEventsDtoImpl extends RoomsEventsDto {
     return Object.hashAll(<Object?>[
       runtimeType,
       room,
-      user,
       type,
     ]);
   }
@@ -63,7 +69,7 @@ class _$RoomsEventsDtoImpl extends RoomsEventsDto {
     String toStringOutput = 'RoomsEventsDto{<optimized out>}';
     assert(() {
       toStringOutput =
-          'RoomsEventsDto@<$hexIdentity>{room: $room, user: $user, type: $type}';
+          'RoomsEventsDto@<$hexIdentity>{room: $room, users: $users, type: $type}';
       return true;
     }());
     return toStringOutput;
@@ -76,13 +82,13 @@ class _$RoomsEventsDtoImpl extends RoomsEventsDto {
 abstract interface class _RoomsEventsDtoCopyWithProxy {
   RoomsEventsDto room(String newValue);
 
-  $UserCopyWithProxyChain<RoomsEventsDto> get user;
+  RoomsEventsDto users(List<User> newValue);
 
   RoomsEventsDto type(String newValue);
 
   RoomsEventsDto call({
     final String? room,
-    final User? user,
+    final List<User>? users,
     final String? type,
   });
 }
@@ -98,9 +104,7 @@ class _RoomsEventsDtoCopyWithProxyImpl implements _RoomsEventsDtoCopyWithProxy {
 
   @pragma('vm:prefer-inline')
   @override
-  $UserCopyWithProxyChain<RoomsEventsDto> get user =>
-      $UserCopyWithProxyChain<RoomsEventsDto>(
-          _value.user, (User update) => this(user: update));
+  RoomsEventsDto users(List<User> newValue) => this(users: newValue);
 
   @pragma('vm:prefer-inline')
   @override
@@ -110,12 +114,12 @@ class _RoomsEventsDtoCopyWithProxyImpl implements _RoomsEventsDtoCopyWithProxy {
   @override
   RoomsEventsDto call({
     final String? room,
-    final User? user,
+    final List<User>? users,
     final String? type,
   }) {
     return _$RoomsEventsDtoImpl(
       room: room ?? _value.room,
-      user: user ?? _value.user,
+      users: users ?? _value.users,
       type: type ?? _value.type,
     );
   }
@@ -128,13 +132,13 @@ sealed class $RoomsEventsDtoCopyWithProxyChain<$Result> {
 
   $Result room(String newValue);
 
-  $Result user(User newValue);
+  $Result users(List<User> newValue);
 
   $Result type(String newValue);
 
   $Result call({
     final String? room,
-    final User? user,
+    final List<User>? users,
     final String? type,
   });
 }
@@ -152,7 +156,7 @@ class _RoomsEventsDtoCopyWithProxyChainImpl<$Result>
 
   @pragma('vm:prefer-inline')
   @override
-  $Result user(User newValue) => this(user: newValue);
+  $Result users(List<User> newValue) => this(users: newValue);
 
   @pragma('vm:prefer-inline')
   @override
@@ -162,12 +166,12 @@ class _RoomsEventsDtoCopyWithProxyChainImpl<$Result>
   @override
   $Result call({
     final String? room,
-    final User? user,
+    final List<User>? users,
     final String? type,
   }) {
     return _chain(_$RoomsEventsDtoImpl(
       room: room ?? _value.room,
-      user: user ?? _value.user,
+      users: users ?? _value.users,
       type: type ?? _value.type,
     ));
   }

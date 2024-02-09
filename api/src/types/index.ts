@@ -4,16 +4,18 @@ export type MyRequest = Request & { user: UserEntity };
 
 interface ICommon {
   type: 'join' | 'leave' | 'message';
+  id?: string;
 }
 export interface IoMessage extends ICommon {
   message: string;
   sender: string;
   receiver: string;
   room?: string;
+  createdAt?: number;
 }
 export interface IoMessageEnterOrExit extends ICommon {
   room: string;
-  user: UserEntity;
+  users: UserEntity[];
 }
 
 export type ServerToClientTypes = {

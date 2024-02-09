@@ -1,3 +1,5 @@
+import 'package:app/models/sealed_classes.dart';
+import 'package:app/models/user_dto.dart';
 import 'package:data_class_plugin/data_class_plugin.dart';
 
 part 'message_dto.gen.dart';
@@ -8,24 +10,31 @@ part 'message_dto.gen.dart';
   toJson: true,
   fromJson: true,
 )
-abstract class MessageDto {
+abstract class MessageDto extends Message {
   MessageDto.ctor();
 
   /// Default constructor
   factory MessageDto({
+    required int createdAt,
     required String message,
-    required String sender,
-    required String receiver,
     String? room,
+    required User sender,
+    required String receiver,
   }) = _$MessageDtoImpl;
 
+  @override
   String get message;
 
-  String get sender;
+  @override
+  String? get room;
 
+  User get sender;
+
+  @override
   String get receiver;
 
-  String? get room;
+  @override
+  int get createdAt;
 
   /// Creates an instance of [MessageDto] from [json]
   factory MessageDto.fromJson(Map<dynamic, dynamic> json) =

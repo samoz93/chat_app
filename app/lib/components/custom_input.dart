@@ -129,11 +129,38 @@ class _CustomInputState extends State<CustomInput> {
     BuildContext context,
   ) {
     if (icon == null) return null;
+    return IconBox(
+      icon: icon,
+      type: type,
+      onClick: type == IconType.prefix
+          ? widget.onPrefixClicked
+          : widget.onSuffixClicked,
+      color: getColor,
+      colorUnder: getColorUnder,
+    );
+  }
+}
 
+class IconBox extends StatelessWidget {
+  final IconData icon;
+  final IconType type;
+  final void Function()? onClick;
+  final Color color;
+  final Color colorUnder;
+
+  const IconBox({
+    super.key,
+    required this.icon,
+    required this.type,
+    this.onClick,
+    this.color = Colors.white,
+    this.colorUnder = Colors.white,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: type == IconType.suffix
-          ? widget.onSuffixClicked
-          : widget.onPrefixClicked,
+      onTap: onClick,
       child: Container(
         padding: EdgeInsets.all(
           4.2.w,
@@ -147,13 +174,13 @@ class _CustomInputState extends State<CustomInput> {
           color: Theme.of(context).colorScheme.secondary,
           border: BorderDirectional(
             bottom: BorderSide(
-              color: getColorUnder,
+              color: colorUnder,
             ),
           ),
         ),
         child: Icon(
           icon,
-          color: getColor,
+          color: color,
         ),
       ),
     );

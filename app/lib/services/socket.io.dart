@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:app/constants/config.dart';
+import 'package:app/models/admin_mesage_dto.dart';
 import 'package:app/models/message_dto.dart';
+import 'package:app/models/old_messages_dto.dart';
 import 'package:app/models/room_events_dto.dart';
+import 'package:app/models/sealed_classes.dart';
 import 'package:app/services/local_storage.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/utils/prettyprint.dart';
@@ -13,10 +16,12 @@ const List EVENTS = [];
 class SocketService {
   final storage = it.get<LocalStorage>();
 
-  final _message_controller = StreamController<MessageDto>.broadcast();
+  final _message_controller = StreamController<Message>.broadcast();
   final _room_controller = StreamController<RoomsEventsDto>.broadcast();
+  final _old_messages = StreamController<OldMessagesDto>.broadcast();
 
   get message_stream => _message_controller.stream;
+  Stream<OldMessagesDto> get old_messages_stream => _old_messages.stream;
   Stream<RoomsEventsDto> get room_stream => _room_controller.stream;
 
   SocketService();
@@ -34,26 +39,43 @@ class SocketService {
     _setListener();
   }
 
-  sendMessage(String event, dynamic data) {
-    final msg = {
-      "user": storage.me?.id,
-      "event": event,
-      "data": data,
-    };
+  sendMessageToRoom(String message, String roomId) {
+    final data = MessageDto(
+      message: message,
+      room: roomId,
+      receiver: "",
+      sender: storage.me!,
+      createdAt: DateTime.now().millisecondsSinceEpoch,
+    );
 
-    socket?.emitWithAck("event", msg, ack: (data) {}, binary: false);
+    socket?.emit("message", data.toJson());
   }
+
+  // sendMessageToUser(String message, String userId) {
+  //   socket?.emitWithAck("event", data.toJson(), ack: (data) {}, binary: false);
+  // }
 
   var _toggle = false;
 
   _setListener() {
     socket?.on("newMessage", (data) {
-      prettyPrint('new message $data');
+      Message message;
+      if (data['sender'] is String) {
+        message = AdminMessage.fromJson(data);
+      } else {
+        message = MessageDto.fromJson(data);
+      }
+      _message_controller.add(message);
     });
 
     socket?.on("roomEvents", (data) {
       var event = RoomsEventsDto.fromJson(data);
       _room_controller.add(event);
+    });
+
+    socket?.on("oldMessages", (data) {
+      var oldMessages = OldMessagesDto.fromJson(data);
+      _old_messages.add(oldMessages);
     });
 
     socket?.onConnect((data) {

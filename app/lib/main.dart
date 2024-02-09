@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:app/pages/auth_page.dart';
+import 'package:app/pages/chat_page.dart';
 import 'package:app/pages/home_page.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/stores/auth_store.dart';
@@ -62,10 +63,32 @@ class MyApp extends StatelessWidget {
             tertiary: const Color.fromARGB(255, 42, 105, 252),
           ),
         ),
-        home: authStore.isLoggedIn ? const HomePage() : const AuthPage(),
-        routes: {
-          "/home": (context) => const HomePage(),
-          "/auth": (context) => const AuthPage(),
+        onGenerateInitialRoutes: (initialRoute) {
+          return [
+            MaterialPageRoute(
+              builder: (context) =>
+                  authStore.isLoggedIn ? const HomePage() : const AuthPage(),
+            ),
+          ];
+        },
+        onGenerateRoute: (settings) {
+          if (settings.name == ChatPage.route) {
+            final roomId = settings.arguments as String;
+            return MaterialPageRoute(
+              builder: (context) => ChatPage(roomId: roomId),
+            );
+          }
+          if (settings.name == AuthPage.route) {
+            return MaterialPageRoute(
+              builder: (context) => const AuthPage(),
+            );
+          }
+          if (settings.name == HomePage.route) {
+            return MaterialPageRoute(
+              builder: (context) => const HomePage(),
+            );
+          }
+          return null;
         },
       );
     });

@@ -49,6 +49,8 @@ dependencies:
   socket_io_client: ^2.0.3+1
   widget_mask: ^1.0.0
   flutter_mobx: ^2.2.0+2
+  intl: ^0.19.0
+  collection: ^1.18.0
 
 dev_dependencies:
   flutter_test:

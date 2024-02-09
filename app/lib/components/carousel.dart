@@ -1,4 +1,5 @@
 import 'package:app/helpers/carousel_item.dart';
+import 'package:app/pages/chat_page.dart';
 import 'package:app/pages/home_page.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/services/socket.io.dart';
@@ -60,9 +61,10 @@ class _CarouselState extends State<Carousel> {
             padEnds: false,
             itemBuilder: (context, index) {
               final item = widget.items[index];
-              return TapRegion(
-                onTapInside: (event) => {
-                  _client.joinRoom(item.id),
+              return GestureDetector(
+                onTap: () => {
+                  Navigator.of(context)
+                      .pushNamed(ChatPage.route, arguments: item.id)
                 },
                 child: Container(
                   padding: EdgeInsets.all(15.sp),

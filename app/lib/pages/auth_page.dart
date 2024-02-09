@@ -18,7 +18,7 @@ enum AuthMode {
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
-
+  static const route = "/auth";
   @override
   State<AuthPage> createState() => _AuthPageState();
 }

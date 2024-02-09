@@ -24,26 +24,75 @@ mixin _$RoomsStore on _RoomsStore, Store {
     });
   }
 
+  late final _$messagesAtom =
+      Atom(name: '_RoomsStore.messages', context: context);
+
+  @override
+  Map<String, List<Message>> get messages {
+    _$messagesAtom.reportRead();
+    return super.messages;
+  }
+
+  @override
+  set messages(Map<String, List<Message>> value) {
+    _$messagesAtom.reportWrite(value, super.messages, () {
+      super.messages = value;
+    });
+  }
+
   late final _$_RoomsStoreActionController =
       ActionController(name: '_RoomsStore', context: context);
 
   @override
-  void joinRoom(String room, User user) {
-    final _$actionInfo =
-        _$_RoomsStoreActionController.startAction(name: '_RoomsStore.joinRoom');
+  void updateRoom(String room, List<User> users) {
+    final _$actionInfo = _$_RoomsStoreActionController.startAction(
+        name: '_RoomsStore.updateRoom');
     try {
-      return super.joinRoom(room, user);
+      return super.updateRoom(room, users);
     } finally {
       _$_RoomsStoreActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void leaveRoom(String room, User user) {
+  void appendMessage(String room, Message message) {
+    final _$actionInfo = _$_RoomsStoreActionController.startAction(
+        name: '_RoomsStore.appendMessage');
+    try {
+      return super.appendMessage(room, message);
+    } finally {
+      _$_RoomsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void leaveRoom(String room) {
     final _$actionInfo = _$_RoomsStoreActionController.startAction(
         name: '_RoomsStore.leaveRoom');
     try {
-      return super.leaveRoom(room, user);
+      return super.leaveRoom(room);
+    } finally {
+      _$_RoomsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void joinRoom(String room) {
+    final _$actionInfo =
+        _$_RoomsStoreActionController.startAction(name: '_RoomsStore.joinRoom');
+    try {
+      return super.joinRoom(room);
+    } finally {
+      _$_RoomsStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void sendMessage(String message, String room) {
+    final _$actionInfo = _$_RoomsStoreActionController.startAction(
+        name: '_RoomsStore.sendMessage');
+    try {
+      return super.sendMessage(message, room);
     } finally {
       _$_RoomsStoreActionController.endAction(_$actionInfo);
     }
@@ -52,7 +101,8 @@ mixin _$RoomsStore on _RoomsStore, Store {
   @override
   String toString() {
     return '''
-rooms: ${rooms}
+rooms: ${rooms},
+messages: ${messages}
     ''';
   }
 }
