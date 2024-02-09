@@ -21,19 +21,19 @@ spec:
           envFrom:
             - configMapRef:
                 name: chat-config
-          volumeMounts:
-            - mountPath: /data
-              name: redis-storage
-          args:
-            - "--save"
-            - ""
-            - "--appendonly"
-            - "no"
+          # volumeMounts:
+          #   - mountPath: /data
+          #     name: redis-storage
+          # args:
+          #   - "--save"
+          #   - ""
+          #   - "--appendonly"
+          #   - "no"
 
-      volumes:
-        - name: redis-storage
-          persistentVolumeClaim:
-            claimName: pv-claim-redis
+      # volumes:
+      #   - name: redis-storage
+      #     persistentVolumeClaim:
+      #       claimName: pv-claim-redis
 
 ---
 apiVersion: v1

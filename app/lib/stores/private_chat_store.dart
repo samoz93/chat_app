@@ -1,65 +1,34 @@
 import 'dart:async';
 
-import 'package:app/models/message_dto.dart';
 import 'package:app/models/sealed_classes.dart';
-import 'package:app/models/user_dto.dart';
 import 'package:app/services/local_storage.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/services/socket.io.dart';
-import 'package:app/utils/prettyprint.dart';
 import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
 import 'package:mobx/mobx.dart';
 
-part 'rooms_store.g.dart';
+part 'private_chat_store.g.dart';
 
-class RoomsStore extends RoomsStoreBase with _$RoomsStore {
-  RoomsStore({required super.roomId});
+class PrivateChatStore extends PrivateChatStoreBase with _$PrivateChatStore {
+  PrivateChatStore({required super.receiverId});
 }
 
-const DEFAULT_GROUPING_MAX = 60 * 24; // 24 hours
-const DEFAULT_GROUPING_MIN = 5; // 5 minute
-const DEFAULT_GROUPING_MIDDLE = 60; // 30 minutes
-const grouping = {
-  "max": DEFAULT_GROUPING_MAX,
-  "min": DEFAULT_GROUPING_MIN,
-  "middle": DEFAULT_GROUPING_MIDDLE,
-};
-
-abstract class RoomsStoreBase with Store {
+abstract class PrivateChatStoreBase with Store {
   final _io = it.get<SocketService>();
   final storage = it.get<LocalStorage>();
-  final String roomId;
+  final String receiverId;
   final List<StreamSubscription<dynamic>> _disposers = [];
-  RoomsStoreBase({required this.roomId}) {
-    final dis = _io.room_stream.where((event) {
-      return event.room == roomId;
-    }).listen((event) {
-      prettyPrint(event);
 
-      updateRoom(event.users);
-    });
-    _disposers.add(dis);
-
+  PrivateChatStoreBase({required this.receiverId}) {
     final dis2 = _io.message_stream
-        .where((event) => event.room == roomId)
+        .where((event) => event.receiver == receiverId)
         .listen((message) {
       appendMessage(message);
     });
 
     _disposers.add(dis2);
-
-    final g = _io.old_messages_stream
-        .where((event) => event.room == roomId)
-        .listen((event) {
-      messages = event.messages.whereType<MessageDto>().toList();
-    });
-
-    _disposers.add(g);
   }
-
-  @observable
-  List<User> users = [];
 
   @observable
   List<Message> messages = [];
@@ -161,30 +130,7 @@ abstract class RoomsStoreBase with Store {
   }
 
   @action
-  void updateRoom(List<User> users) {
-    this.users = users;
-  }
-
-  @action
   void appendMessage(Message message) {
     messages = [...messages, message];
-  }
-
-  @action
-  void leaveRoom() {
-    _io.leaveRoom(roomId);
-    for (var element in _disposers) {
-      element.cancel();
-    }
-  }
-
-  @action
-  void joinRoom() {
-    _io.joinRoom(roomId);
-  }
-
-  @action
-  void sendMessage(String message) {
-    _io.sendMessageToRoom(message, roomId);
   }
 }

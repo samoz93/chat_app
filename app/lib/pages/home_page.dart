@@ -4,10 +4,8 @@ import 'package:app/helpers/carousel_item.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/services/socket.io.dart';
 import 'package:app/stores/auth_store.dart';
-import 'package:app/stores/rooms_store.dart';
 import 'package:app/utils/extensions.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
 final items = [
@@ -54,7 +52,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _store = it.get<AuthStore>();
   final _io = it.get<SocketService>();
-  final _rooms = it.get<RoomsStore>();
 
   Widget get _spacer => SizedBox(height: 15.sp);
   @override
@@ -83,20 +80,6 @@ class _HomePageState extends State<HomePage> {
                   title: "Favourite",
                 ),
               ),
-              Observer(
-                builder: (context) {
-                  return Column(
-                    children: _rooms.rooms.entries
-                        .map((e) => Column(
-                              children: [
-                                Text(e.key),
-                                ...e.value.map((e) => Text(e.name))
-                              ],
-                            ))
-                        .toList(),
-                  );
-                },
-              )
             ],
           ),
         ),

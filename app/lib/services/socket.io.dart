@@ -20,7 +20,7 @@ class SocketService {
   final _room_controller = StreamController<RoomsEventsDto>.broadcast();
   final _old_messages = StreamController<OldMessagesDto>.broadcast();
 
-  get message_stream => _message_controller.stream;
+  Stream<Message> get message_stream => _message_controller.stream;
   Stream<OldMessagesDto> get old_messages_stream => _old_messages.stream;
   Stream<RoomsEventsDto> get room_stream => _room_controller.stream;
 
@@ -55,7 +55,7 @@ class SocketService {
   //   socket?.emitWithAck("event", data.toJson(), ack: (data) {}, binary: false);
   // }
 
-  var _toggle = false;
+  final _toggle = false;
 
   _setListener() {
     socket?.on("newMessage", (data) {
@@ -87,43 +87,17 @@ class SocketService {
     socket?.onConnectError((data) {
       prettyPrint('connect error $data');
     });
-    socket?.onConnectTimeout((data) {
-      prettyPrint('connect timeout $data');
-    });
     socket?.onError((data) {
       prettyPrint('error $data');
-    });
-    socket?.onReconnect((data) {
-      prettyPrint('reconnect $data');
-    });
-    socket?.onReconnectAttempt((data) {
-      prettyPrint('reconnect attempt $data');
-    });
-    socket?.onReconnecting((data) {
-      prettyPrint('reconnecting $data');
-    });
-    socket?.onReconnectError((data) {
-      prettyPrint('reconnect error $data');
-    });
-    socket?.onReconnectFailed((data) {
-      prettyPrint('reconnect failed $data');
     });
   }
 
   joinRoom(String roomId) {
-    if (_toggle) {
-      return leaveRoom(roomId);
-    }
     socket?.emit("join", roomId);
-    _toggle = !_toggle;
   }
 
   leaveRoom(String roomId) {
-    if (!_toggle) {
-      return joinRoom(roomId);
-    }
     socket?.emit("leave", roomId);
-    _toggle = !_toggle;
   }
 
   destroy() {

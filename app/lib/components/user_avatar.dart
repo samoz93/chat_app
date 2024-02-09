@@ -9,10 +9,10 @@ class UsersAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final height = 25.sp;
-    final margin = index == null ? 0.sp : height * .3;
-    final marginTop = (index ?? 0) % 2 == 0 ? 0.sp : margin;
-    final marginBottom = (index ?? 0) % 2 == 0 ? margin : 0.sp;
+    final height = 30.sp;
+    final margin = index == null ? 0.sp : height * .1;
+    final marginTop = (index ?? 0) % 2 == 0 ? 0.sp : margin * 2;
+    final marginBottom = (index ?? 0) % 2 == 0 ? margin * 2 : 0.sp;
 
     return Container(
       width: height,

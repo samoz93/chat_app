@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:app/components/custom_input.dart';
 import 'package:app/components/message_tile.dart';
 import 'package:app/components/user_avatar.dart';
+import 'package:app/models/admin_mesage_dto.dart';
 import 'package:app/models/sealed_classes.dart';
-import 'package:app/services/locator.dart';
 import 'package:app/stores/rooms_store.dart';
+import 'package:app/utils/throttler.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -22,41 +24,47 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final _store = it.get<RoomsStore>();
+  late final RoomsStore _store;
   final _txtCtrl = TextEditingController();
   final _scrlCtrl = ScrollController();
   late ReactionDisposer dis;
   @override
   void initState() {
-    _store.joinRoom(widget.roomId);
-    super.initState();
+    _store = RoomsStore(roomId: widget.roomId);
+    _store.joinRoom();
     Future.delayed(500.ms, () {
+      _scrlCtrl.jumpTo(
+        _scrlCtrl.position.maxScrollExtent,
+      );
+    });
+    _scrlCtrl.addListener(scrollListener);
+    dis = autorun((_) {
+      final finalMessage = _store.messages.last;
+      if (finalMessage is AdminMessage) return;
       _scrlCtrl.animateTo(
-        _scrlCtrl.position.maxScrollExtent + 500,
-        duration: 500.ms,
-        curve: Curves.easeInOut,
+        _scrlCtrl.position.maxScrollExtent + 40.sp,
+        duration: 100.ms,
+        curve: Curves.decelerate,
       );
     });
 
-    dis = autorun((_) {
-      _store.messages; // do nothing just trigger the reaction
-      _scrlCtrl.animateTo(
-        _scrlCtrl.position.maxScrollExtent + 100,
-        duration: 500.ms,
-        curve: Curves.easeInOut,
-      );
-    });
+    super.initState();
   }
 
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
+  final throttler = Throttler(duration: 300.ms);
+
+  scrollListener() {
+    throttler.run(() {
+      if (_scrlCtrl.offset < -15) {
+        _store.loadMoreMessages();
+      }
+    });
   }
 
   @override
   void dispose() {
-    _store.leaveRoom(widget.roomId);
+    _store.leaveRoom();
+    _scrlCtrl.removeListener(scrollListener);
     dis();
     super.dispose();
   }
@@ -105,10 +113,10 @@ class _ChatPageState extends State<ChatPage> {
                   shrinkWrap: true,
                   padding: EdgeInsets.zero,
                   scrollDirection: Axis.horizontal,
-                  itemCount: _store.rooms[widget.roomId]?.length ?? 0,
+                  itemCount: _store.users.length,
                   itemBuilder: (context, index) {
-                    final user = _store.rooms[widget.roomId]?.elementAt(index);
-                    return UsersAvatar(user: user!, index: index);
+                    final user = _store.users.elementAt(index);
+                    return UsersAvatar(user: user, index: index);
                   },
                 ),
               );
@@ -129,9 +137,10 @@ class _ChatPageState extends State<ChatPage> {
               Flexible(
                 flex: 1,
                 child: Observer(builder: (context) {
-                  final messages = _store.messageGroups2(widget.roomId);
+                  final messages = _store.messageGroups;
                   return CustomScrollView(
                     controller: _scrlCtrl,
+                    dragStartBehavior: DragStartBehavior.down,
                     slivers: [
                       ...messages.map(
                         (data) {
@@ -158,8 +167,8 @@ class _ChatPageState extends State<ChatPage> {
                           }
                           _store.sendMessage(
                             _txtCtrl.value.text,
-                            widget.roomId,
                           );
+                          _txtCtrl.value = TextEditingValue.empty;
                         },
                       ),
                     ),

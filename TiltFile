@@ -4,7 +4,7 @@ k8s_namespace("chat-app")
 
 k8s_yaml([file for file in listdir( "./infra/dev" , recursive = True ) if file.endswith('.yaml')])
 # k8s_resource('rabbitmq-depl', port_forwards=3001)
-k8s_resource("api-deployment", port_forwards=3000)
+# k8s_resource("flask-deployment", port_forwards=5000)
 
 docker_build('samoz93/chat-api', 'api',
     build_args={'node_env': 'development'},
@@ -16,6 +16,13 @@ docker_build('samoz93/chat-api', 'api',
         
         run('cd /api && pnpm i', trigger=['./api/package.json']),
 ])
+
+# docker_build('samoz93/flask-api', 'python-be',
+#     live_update=[
+#         sync('./python-be', '/app'),
+        
+#         run('pip install --no-cache-dir -r requirements.txt', trigger=['./python-be/requirements.txt']),
+# ])
 
 
 
