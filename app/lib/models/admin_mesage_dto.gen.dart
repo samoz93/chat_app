@@ -9,7 +9,6 @@ class _$AdminMessageImpl extends AdminMessage {
   _$AdminMessageImpl({
     required this.message,
     this.room,
-    required this.receiver,
     required this.sender,
   }) : super.ctor();
 
@@ -20,16 +19,12 @@ class _$AdminMessageImpl extends AdminMessage {
   final String? room;
 
   @override
-  final String receiver;
-
-  @override
   final String sender;
 
   factory _$AdminMessageImpl.fromJson(Map<dynamic, dynamic> json) {
     return _$AdminMessageImpl(
       message: json['message'] as String,
       room: json['room'] as String?,
-      receiver: json['receiver'] as String,
       sender: json['sender'] as String,
     );
   }
@@ -39,7 +34,6 @@ class _$AdminMessageImpl extends AdminMessage {
     return <String, dynamic>{
       'message': message,
       'room': room,
-      'receiver': receiver,
       'sender': sender,
     };
   }
@@ -51,7 +45,6 @@ class _$AdminMessageImpl extends AdminMessage {
             runtimeType == other.runtimeType &&
             message == other.message &&
             room == other.room &&
-            receiver == other.receiver &&
             sender == other.sender;
   }
 
@@ -61,7 +54,6 @@ class _$AdminMessageImpl extends AdminMessage {
       runtimeType,
       message,
       room,
-      receiver,
       sender,
     ]);
   }
@@ -71,7 +63,7 @@ class _$AdminMessageImpl extends AdminMessage {
     String toStringOutput = 'AdminMessage{<optimized out>}';
     assert(() {
       toStringOutput =
-          'AdminMessage@<$hexIdentity>{message: $message, room: $room, receiver: $receiver, sender: $sender}';
+          'AdminMessage@<$hexIdentity>{message: $message, room: $room, sender: $sender}';
       return true;
     }());
     return toStringOutput;
@@ -86,14 +78,11 @@ abstract interface class _AdminMessageCopyWithProxy {
 
   AdminMessage room(String? newValue);
 
-  AdminMessage receiver(String newValue);
-
   AdminMessage sender(String newValue);
 
   AdminMessage call({
     final String? message,
     final String? room,
-    final String? receiver,
     final String? sender,
   });
 }
@@ -113,10 +102,6 @@ class _AdminMessageCopyWithProxyImpl implements _AdminMessageCopyWithProxy {
 
   @pragma('vm:prefer-inline')
   @override
-  AdminMessage receiver(String newValue) => this(receiver: newValue);
-
-  @pragma('vm:prefer-inline')
-  @override
   AdminMessage sender(String newValue) => this(sender: newValue);
 
   @pragma('vm:prefer-inline')
@@ -124,13 +109,11 @@ class _AdminMessageCopyWithProxyImpl implements _AdminMessageCopyWithProxy {
   AdminMessage call({
     final String? message,
     final Object? room = const Object(),
-    final String? receiver,
     final String? sender,
   }) {
     return _$AdminMessageImpl(
       message: message ?? _value.message,
       room: identical(room, const Object()) ? _value.room : (room as String?),
-      receiver: receiver ?? _value.receiver,
       sender: sender ?? _value.sender,
     );
   }
@@ -145,14 +128,11 @@ sealed class $AdminMessageCopyWithProxyChain<$Result> {
 
   $Result room(String? newValue);
 
-  $Result receiver(String newValue);
-
   $Result sender(String newValue);
 
   $Result call({
     final String? message,
     final String? room,
-    final String? receiver,
     final String? sender,
   });
 }
@@ -174,10 +154,6 @@ class _AdminMessageCopyWithProxyChainImpl<$Result>
 
   @pragma('vm:prefer-inline')
   @override
-  $Result receiver(String newValue) => this(receiver: newValue);
-
-  @pragma('vm:prefer-inline')
-  @override
   $Result sender(String newValue) => this(sender: newValue);
 
   @pragma('vm:prefer-inline')
@@ -185,13 +161,11 @@ class _AdminMessageCopyWithProxyChainImpl<$Result>
   $Result call({
     final String? message,
     final Object? room = const Object(),
-    final String? receiver,
     final String? sender,
   }) {
     return _chain(_$AdminMessageImpl(
       message: message ?? _value.message,
       room: identical(room, const Object()) ? _value.room : (room as String?),
-      receiver: receiver ?? _value.receiver,
       sender: sender ?? _value.sender,
     ));
   }

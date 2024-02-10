@@ -4,6 +4,8 @@ import 'package:app/constants/config.dart';
 import 'package:app/models/admin_mesage_dto.dart';
 import 'package:app/models/message_dto.dart';
 import 'package:app/models/old_messages_dto.dart';
+import 'package:app/models/private_chat_dto.dart';
+import 'package:app/models/private_messsage_dto.dart';
 import 'package:app/models/room_events_dto.dart';
 import 'package:app/models/sealed_classes.dart';
 import 'package:app/services/local_storage.dart';
@@ -14,15 +16,19 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 const List EVENTS = [];
 
 class SocketService {
-  final storage = it.get<LocalStorage>();
+  final _storage = it.get<LocalStorage>();
 
-  final _message_controller = StreamController<Message>.broadcast();
-  final _room_controller = StreamController<RoomsEventsDto>.broadcast();
-  final _old_messages = StreamController<OldMessagesDto>.broadcast();
+  final _newMessageController = StreamController<Message>.broadcast();
+  final _roomEventsController = StreamController<RoomsEventsDto>.broadcast();
+  final _oldRoomMessagesControllers =
+      StreamController<OldMessagesDto>.broadcast();
+  final _privateChatController = StreamController<PrivateChatDto>.broadcast();
 
-  Stream<Message> get message_stream => _message_controller.stream;
-  Stream<OldMessagesDto> get old_messages_stream => _old_messages.stream;
-  Stream<RoomsEventsDto> get room_stream => _room_controller.stream;
+  Stream<Message> get newMessageStream => _newMessageController.stream;
+  Stream<OldMessagesDto> get oldRoomMessages =>
+      _oldRoomMessagesControllers.stream;
+  Stream<RoomsEventsDto> get roomUsersStream => _roomEventsController.stream;
+  Stream<PrivateChatDto> get privateChatStream => _privateChatController.stream;
 
   SocketService();
 
@@ -40,11 +46,22 @@ class SocketService {
   }
 
   sendMessageToRoom(String message, String roomId) {
-    final data = MessageDto(
+    final data = RoomMessageDto(
       message: message,
       room: roomId,
       receiver: "",
-      sender: storage.me!,
+      sender: _storage.me!,
+      createdAt: DateTime.now().millisecondsSinceEpoch,
+    );
+
+    socket?.emit("message", data.toJson());
+  }
+
+  sendMessageToUser(String message, String userId) {
+    final data = RoomMessageDto(
+      message: message,
+      receiver: userId,
+      sender: _storage.me!,
       createdAt: DateTime.now().millisecondsSinceEpoch,
     );
 
@@ -55,31 +72,41 @@ class SocketService {
   //   socket?.emitWithAck("event", data.toJson(), ack: (data) {}, binary: false);
   // }
 
-  final _toggle = false;
-
   _setListener() {
     socket?.on("newMessage", (data) {
       Message message;
       if (data['sender'] is String) {
         message = AdminMessage.fromJson(data);
+      } else if (data['room'] != null) {
+        message = RoomMessageDto.fromJson(data);
       } else {
-        message = MessageDto.fromJson(data);
+        message = PrivateMessageDto.fromJson(data);
       }
-      _message_controller.add(message);
+      _newMessageController.add(message);
     });
 
     socket?.on("roomEvents", (data) {
-      var event = RoomsEventsDto.fromJson(data);
-      _room_controller.add(event);
+      final event = RoomsEventsDto.fromJson(data);
+      _roomEventsController.add(event);
     });
 
-    socket?.on("oldMessages", (data) {
-      var oldMessages = OldMessagesDto.fromJson(data);
-      _old_messages.add(oldMessages);
+    socket?.on("oldRoomMessages", (data) {
+      final oldRoomMessages = OldMessagesDto.fromJson(data);
+      _oldRoomMessagesControllers.add(oldRoomMessages);
+    });
+
+    // socket?.on("unreadPrivateMessages", (data) {
+    //   final message = (data as List).map((e) => PrivateMessageDto.fromJson(e));
+    //   _missingPrivateMessageStream.add(message.toList());
+    // });
+
+    socket?.on("onPrivateChat", (data) {
+      final chat = PrivateChatDto.fromJson(data);
+      _privateChatController.add(chat);
     });
 
     socket?.onConnect((data) {
-      prettyPrint('connected $data');
+      prettyPrint('+++++++connected $data');
     });
     socket?.onDisconnect((data) {
       prettyPrint('disconnected $data');
@@ -88,7 +115,10 @@ class SocketService {
       prettyPrint('connect error $data');
     });
     socket?.onError((data) {
-      prettyPrint('error $data');
+      prettyPrint('++++error $data');
+    });
+    socket?.onReconnect((data) {
+      prettyPrint('reconnected $data');
     });
   }
 
@@ -98,6 +128,10 @@ class SocketService {
 
   leaveRoom(String roomId) {
     socket?.emit("leave", roomId);
+  }
+
+  joinChat(String userId) {
+    socket?.emit("joinPrivateChat", userId);
   }
 
   destroy() {

@@ -1,6 +1,8 @@
 import 'package:app/components/user_avatar.dart';
 import 'package:app/models/message_dto.dart';
+import 'package:app/models/private_messsage_dto.dart';
 import 'package:app/models/sealed_classes.dart';
+import 'package:app/models/user_dto.dart';
 import 'package:app/services/local_storage.dart';
 import 'package:app/services/locator.dart';
 import 'package:flutter/material.dart';
@@ -12,14 +14,17 @@ class MessageTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final me = it.get<LocalStorage>().me;
     bool isMe = false;
-    String sender = "";
+    User? sender;
     bool isAdmin = false;
-    if (message is MessageDto) {
-      isMe = (message as MessageDto).sender.id == it.get<LocalStorage>().me?.id;
-      sender = (message as MessageDto).sender.name;
+    if (message is RoomMessageDto) {
+      sender = (message as RoomMessageDto).sender;
+      isMe = me?.id == sender.id;
+    } else if (message is PrivateMessageDto) {
+      sender = (message as PrivateMessageDto).sender;
+      isMe = me?.id == sender.id;
     } else {
-      sender = "Admin";
       isAdmin = true;
     }
     final theme = Theme.of(context);
@@ -62,7 +67,10 @@ class MessageTile extends StatelessWidget {
               right: marginRight,
             ),
             alignment: Alignment.centerRight,
-            padding: EdgeInsets.all(15.sp),
+            padding: EdgeInsets.symmetric(
+              horizontal: isMe ? 15.sp : 26.sp,
+              vertical: 5.sp,
+            ),
             decoration: BoxDecoration(
               color: isMe ? theme.primaryColor : theme.colorScheme.secondary,
               borderRadius: BorderRadius.circular(10),
@@ -77,11 +85,11 @@ class MessageTile extends StatelessWidget {
             ),
           ),
         ),
-        !isMe
+        !isMe && sender != null
             ? Positioned(
                 right: marginRight * .5,
-                bottom: marginBottom * .75,
-                child: UsersAvatar(user: (message as MessageDto).sender),
+                top: 0,
+                child: UsersAvatar(user: sender),
               )
             : const SizedBox(),
       ],

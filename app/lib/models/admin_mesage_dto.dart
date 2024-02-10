@@ -16,7 +16,6 @@ abstract class AdminMessage extends Message {
   factory AdminMessage({
     required String message,
     String? room,
-    required String receiver,
     required String sender,
   }) = _$AdminMessageImpl;
 
@@ -25,9 +24,6 @@ abstract class AdminMessage extends Message {
 
   @override
   String? get room;
-
-  @override
-  String get receiver;
 
   String get sender;
 

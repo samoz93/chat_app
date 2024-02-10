@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { BroadcastOperator, Server } from 'socket.io';
-import { IoMessage, ServerToClientTypes } from 'src/types';
+import {
+  IoPrivateMessage,
+  IoRoomMessage,
+  ServerToClientTypes,
+} from 'src/types';
 import { RedisService } from 'src/user/redis.service';
 import { SocketWithUser } from '../types';
 
@@ -10,8 +14,7 @@ export class RoomClientService {
 
   constructor(private redis: RedisService) {}
 
-  sendMessage(br: BroadcastOperator<any, any>, message: IoMessage) {
-    // TODO: save messages
+  sendMessage(br: BroadcastOperator<any, any>, message: IoRoomMessage) {
     const newMessage = { ...message, createdAt: Date.now() };
     if (message.sender !== 'admin') {
       this.redis.addMessage(message.room, newMessage);
@@ -19,8 +22,28 @@ export class RoomClientService {
     br.emit('newMessage', newMessage);
   }
 
+  async sendToUser(socket: SocketWithUser, message: IoPrivateMessage) {
+    const sender = socket.user;
+    const newMessage = {
+      ...message,
+      createdAt: Date.now(),
+    };
+    await this.redis.addPrivateMessage(sender.id, message.receiver, newMessage);
+    const receiverSocketId = await this.redis.getUserClientId(message.receiver);
+    // User is offline
+    if (!receiverSocketId) {
+      await this.redis.addUnreceivedMessagesFromUser(
+        message.receiver,
+        sender.id,
+      );
+    }
+
+    RoomClientService.server
+      .to([receiverSocketId, socket.id])
+      .emit('newMessage', newMessage);
+  }
+
   async join(room: string, client: SocketWithUser) {
-    // TODO: send last X messages to new user
     // Add to the user to the room (client)
     client.join(room);
     // add the user to the room list
@@ -31,9 +54,7 @@ export class RoomClientService {
     this.sendMessage(client.to(room), {
       message: `${client['user'].name} joined the room`,
       sender: 'admin',
-      receiver: room,
       room,
-      type: 'join',
     });
 
     const users = await this.redis.getRoomMembers(room);
@@ -41,11 +62,14 @@ export class RoomClientService {
     // send an event to notify about the new user in the room (new list)
     RoomClientService.server
       .to(room)
-      .emit('roomEvents', { room, users: users, type: 'join' });
+      .emit('roomEvents', { room, users: users });
 
     // Send old messages to connected client
-    const oldMessages = await this.redis.getMessages(room);
-    client.emit('oldMessages', { room, messages: oldMessages.reverse() });
+    const oldRoomMessages = await this.redis.getMessages(room);
+    client.emit('oldRoomMessages', {
+      room,
+      messages: oldRoomMessages.reverse(),
+    });
 
     return `${client.user.name} Joined ${room}`;
   }
@@ -61,17 +85,14 @@ export class RoomClientService {
     this.sendMessage(client.to(room), {
       message: `${client['user'].name} left the room`,
       sender: 'admin',
-      receiver: room,
       room,
-      type: 'leave',
     });
 
     const users = await this.redis.getRoomMembers(room);
-    client.send('roomEvents', { room, users, type: 'join' });
 
     RoomClientService.server
       .to(room)
-      .emit('roomEvents', { room, users: users, type: 'leave' });
+      .emit('roomEvents', { room, users: users });
 
     return `${client.user.name} Left ${room}`;
   }

@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:app/models/sealed_classes.dart';
+import 'package:app/models/user_dto.dart';
+import 'package:app/services/local_storage.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/services/socket.io.dart';
+import 'package:app/utils/prettyprint.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
@@ -19,28 +22,31 @@ const grouping = {
   "middle": DEFAULT_GROUPING_MIDDLE,
 };
 
-class BaseChat extends BaseChatBase with _$BaseChat {
-  @override
-  bool filter(event) {
-    // TODO: implement filter
-    throw UnimplementedError();
-  }
-}
+abstract class BaseChat<T extends Message> extends BaseChatBase<T>
+    with _$BaseChat<T> {}
 
-abstract class BaseChatBase with Store {
-  final _io = it.get<SocketService>();
+abstract class BaseChatBase<T extends Message> with Store {
+  @protected
+  final io = it.get<SocketService>();
   @protected
   final List<StreamSubscription<dynamic>> disposers = [];
+
+  @protected
+  final me = it.get<LocalStorage>().me!;
+
   BaseChatBase() {
-    final dis2 = _io.message_stream.where(filter).listen((message) {
-      appendMessage(message);
+    final dis2 = io.newMessageStream
+        .where((event) => event is T && filter(event))
+        .listen((message) {
+      prettyPrint("new", message.runtimeType);
+      appendMessage(message as T);
     });
 
     disposers.add(dis2);
   }
 
   @observable
-  List<Message> messages = [];
+  List<T> messages = [];
 
   @observable
   int _page = 0;
@@ -53,9 +59,17 @@ abstract class BaseChatBase with Store {
   }
 
   @computed
-  List<Message> get messageChunck {
+  List<T> get messageChunck {
     final start = _page > totalPages ? 0 : totalPages - _page;
     return messages.sublist(start * _pgItems);
+  }
+
+  @observable
+  List<User> users = [];
+
+  @action
+  void updateUsers(List<User> users) {
+    this.users = users;
   }
 
   @action
@@ -64,9 +78,9 @@ abstract class BaseChatBase with Store {
   }
 
   @computed
-  List<(String, List<Message>)> get messageGroups {
-    List<(String, List<Message>)> list = [];
-    List<Message> leftOver = [];
+  List<(String, List<T>)> get messageGroups {
+    List<(String, List<T>)> list = [];
+    List<T> leftOver = [];
     final breakPoints = {};
     for (var msg in messageChunck) {
       final date = DateTime.fromMillisecondsSinceEpoch(msg.createdAt);
@@ -139,16 +153,18 @@ abstract class BaseChatBase with Store {
   }
 
   @action
-  void appendMessage(Message message) {
+  void appendMessage(T message) {
     messages = [...messages, message];
   }
 
   @protected
-  bool filter(event);
+  bool filter(T event);
 
   void dispose() {
     for (var disposer in disposers) {
       disposer.cancel();
     }
   }
+
+  sendMessage(String text);
 }

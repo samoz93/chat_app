@@ -1,28 +1,37 @@
 import { UserEntity } from 'src/entities/user.entity';
+import { User } from 'src/schema/graphql';
 
 export type MyRequest = Request & { user: UserEntity };
 
 interface ICommon {
-  type: 'join' | 'leave' | 'message';
   id?: string;
 }
-export interface IoMessage extends ICommon {
+interface IMessage extends ICommon {
   message: string;
-  sender: string;
-  receiver: string;
-  room?: string;
+  sender: User | 'admin';
   createdAt?: number;
 }
+
+export interface IoRoomMessage extends IMessage {
+  room?: string;
+}
+
+export interface IoPrivateMessage extends IMessage {
+  receiver?: string;
+}
+
 export interface IoMessageEnterOrExit extends ICommon {
   room: string;
   users: UserEntity[];
 }
 
 export type ServerToClientTypes = {
-  newMessage: (opt: IoMessage) => void;
+  newMessage: (opt: IoRoomMessage) => void;
+  newPrivateMessage: (opt: IoPrivateMessage) => void;
   roomEvents: (opt: IoMessageEnterOrExit) => void;
   newRoom: (opt: string) => void;
   removeRoom: (opt: string) => void;
+  unreadPrivateMessages: (opt: IoPrivateMessage[]) => void;
 };
 
 export const REFRESH_TOKEN = 'refreshToken';

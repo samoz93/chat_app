@@ -1,6 +1,6 @@
 import 'package:app/helpers/carousel_item.dart';
-import 'package:app/pages/chat_page.dart';
 import 'package:app/pages/home_page.dart';
+import 'package:app/pages/room_chat.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/services/socket.io.dart';
 import 'package:flutter/material.dart';
@@ -64,7 +64,7 @@ class _CarouselState extends State<Carousel> {
               return GestureDetector(
                 onTap: () => {
                   Navigator.of(context)
-                      .pushNamed(ChatPage.route, arguments: item.id)
+                      .pushNamed(RoomChatPage.route, arguments: item.id)
                 },
                 child: Container(
                   padding: EdgeInsets.all(15.sp),

@@ -16,14 +16,11 @@ abstract class RoomsEventsDto {
   factory RoomsEventsDto({
     required String room,
     required List<User> users,
-    required String type,
   }) = _$RoomsEventsDtoImpl;
 
   String get room;
 
   List<User> get users;
-
-  String get type;
 
   /// Creates an instance of [RoomsEventsDto] from [json]
   factory RoomsEventsDto.fromJson(Map<dynamic, dynamic> json) =

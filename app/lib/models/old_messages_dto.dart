@@ -17,7 +17,7 @@ class OldMessagesDto {
         if (e['sender'] is String) {
           return AdminMessage.fromJson(e);
         } else {
-          return MessageDto.fromJson(e);
+          return RoomMessageDto.fromJson(e);
         }
       }).toList(),
       room: json['room'],

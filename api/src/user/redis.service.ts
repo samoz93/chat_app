@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { RedisClientType, createClient } from 'redis';
 import { CONFIG } from 'src/config';
 import { UserEntity } from 'src/entities/user.entity';
-import { IoMessage } from 'src/types';
+import { IoPrivateMessage, IoRoomMessage } from 'src/types';
 
 const USERS_COLLECTION = 'users';
 @Injectable()
@@ -37,6 +37,11 @@ export class RedisService {
 
   private getUserInfoKey(userId: string): string {
     return `user_info:${userId}`;
+  }
+
+  private getMessagesKey(room: string) {
+    const day = `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}`;
+    return `messages:${room}:${day}`;
   }
 
   // Add and remove rooms form/to user
@@ -104,23 +109,71 @@ export class RedisService {
 
   // For testing TODO: remove later
   async getAllUsers() {
-    const g = await this.client.hGetAll(USERS_COLLECTION);
-    return g;
-  }
-
-  private getMessagesKey(room: string) {
-    const day = `${new Date().getFullYear()}-${new Date().getMonth()}-${new Date().getDate()}`;
-    return `messages:${room}:${day}`;
+    return await this.client.hGetAll(USERS_COLLECTION);
   }
   // Rooms messages
-  async addMessage(room: string, message: IoMessage) {
+  async addMessage(room: string, message: IoRoomMessage) {
     this.client.lPush(this.getMessagesKey(room), JSON.stringify(message));
   }
 
-  async getMessages(room: string): Promise<IoMessage[]> {
+  async getMessages(room: string): Promise<IoRoomMessage[]> {
     const data =
       (await this.client.lRange(this.getMessagesKey(room), 0, -1)) || [];
     return data.map((str) => JSON.parse(str)); // (await this.jsonClient.get(`messages:${room}`)) || ([] as IoMessage[])
+  }
+
+  // Private messages
+  private async getCombinedKey(sender: string, receiver: string) {
+    const key = `private_messages:${sender}:${receiver}`;
+    const exist = await this.client.exists(key);
+    if (exist) {
+      return key;
+    } else {
+      return `private_messages:${receiver}:${sender}`;
+    }
+  }
+
+  async addPrivateMessage(
+    sender: string,
+    receiver: string,
+    message: IoRoomMessage,
+  ) {
+    const combinedKey = await this.getCombinedKey(sender, receiver);
+    console.log('combinedKey', combinedKey);
+
+    this.client.lPush(combinedKey, JSON.stringify(message));
+  }
+
+  async addUnreceivedMessagesFromUser(receiver: string, sender: string) {
+    this.client.lPush(`private_messages:unread:${receiver}`, sender);
+  }
+
+  async getPrivateMessages(
+    sender: string,
+    receiver: string,
+  ): Promise<IoRoomMessage[]> {
+    const combinedKey = await this.getCombinedKey(sender, receiver);
+    const data = (await this.client.lRange(combinedKey, 0, -1)) || [];
+    return data.map((str) => JSON.parse(str)); // (await this.jsonClient.get(`messages:${room}`)) || ([] as IoMessage[])
+  }
+
+  async getUnreceivedMessages(userId: string): Promise<IoPrivateMessage[]> {
+    try {
+      const unreadUsers =
+        (await this.client.lRange(
+          `private_messages:unread:${userId}`,
+          0,
+          -1,
+        )) || [];
+      const msgs = [];
+      for await (const sender of unreadUsers) {
+        const data = await this.getPrivateMessages(userId, sender);
+        msgs.push(...data);
+      }
+      return msgs;
+    } catch (error) {
+      console.log('Error getting unreceived messages', error);
+    }
   }
 
   onDestroy() {
