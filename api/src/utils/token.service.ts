@@ -16,6 +16,7 @@ export class TokenService {
   private jwtRefreshService = new JwtService({
     secret: CONFIG.jwtSecret,
     global: true,
+    verifyOptions: { algorithms: ['ES256'] },
     signOptions: { expiresIn: '7d' },
   });
 

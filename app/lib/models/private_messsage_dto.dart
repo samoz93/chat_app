@@ -2,7 +2,7 @@ import 'package:app/models/sealed_classes.dart';
 import 'package:app/models/user_dto.dart';
 import 'package:data_class_plugin/data_class_plugin.dart';
 
-part 'message_dto.gen.dart';
+part 'private_messsage_dto.gen.dart';
 
 @DataClass(
   $toString: true,
@@ -10,23 +10,19 @@ part 'message_dto.gen.dart';
   toJson: true,
   fromJson: true,
 )
-abstract class RoomMessageDto extends Message {
-  RoomMessageDto.ctor();
+abstract class PrivateMessageDto extends Message {
+  PrivateMessageDto.ctor();
 
   /// Default constructor
-  factory RoomMessageDto({
-    required int createdAt,
+  factory PrivateMessageDto({
     required String message,
-    String? room,
     required User sender,
     required String receiver,
-  }) = _$MessageDtoImpl;
+    required int createdAt,
+  }) = _$PrivateMessageDtoImpl;
 
   @override
   String get message;
-
-  @override
-  String? get room;
 
   User get sender;
 
@@ -36,10 +32,10 @@ abstract class RoomMessageDto extends Message {
   @override
   int get createdAt;
 
-  /// Creates an instance of [RoomMessageDto] from [json]
-  factory RoomMessageDto.fromJson(Map<dynamic, dynamic> json) =
-      _$MessageDtoImpl.fromJson;
+  /// Creates an instance of [PrivateMessageDto] from [json]
+  factory PrivateMessageDto.fromJson(Map<dynamic, dynamic> json) =
+      _$PrivateMessageDtoImpl.fromJson;
 
-  /// Converts [RoomMessageDto] to a [Map] json
+  /// Converts [PrivateMessageDto] to a [Map] json
   Map<String, dynamic> toJson();
 }

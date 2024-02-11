@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Query, Resolver } from '@nestjs/graphql';
 import { GQAuthGuard } from 'src/auth/auth.guard';
 import { UserService } from './user.service';
 
@@ -11,10 +11,5 @@ export class UserResolver {
   @Query('user')
   async getUser(@Args('id') id: string) {
     return this.service.getUserById(id);
-  }
-
-  @Mutation('deleteUser')
-  async deleteUser(@Args('id') id: string) {
-    return this.service.deleteUser(id);
   }
 }

@@ -12,9 +12,6 @@ RUN apk add git
 
 # Install the required packages
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install accelerate
-RUN pip install git+https://github.com/huggingface/diffusers
-RUN pip3 install torch torchvision
 
 # Copy the Flask app code
 COPY . .

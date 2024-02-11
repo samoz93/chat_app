@@ -89,7 +89,7 @@ describe('GraphQl, Testing User functionalities', () => {
   it('/Web socket a user can connect to websocket', async () => {
     console.log(token);
 
-    const socket = io(`http://localhost:3000`, {
+    const socket = io(`http://localhost`, {
       extraHeaders: {
         authorization: `Bearer ${token}`,
       },

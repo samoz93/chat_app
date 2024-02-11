@@ -10,7 +10,11 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { IoMessage, ServerToClientTypes } from 'src/types';
+import {
+  IoPrivateMessage,
+  IoRoomMessage,
+  ServerToClientTypes,
+} from 'src/types';
 import { RedisService } from 'src/user/redis.service';
 import { TokenService } from 'src/utils';
 import { RoomClientService } from './room.client/room.client.service';
@@ -28,6 +32,8 @@ export class MessagesGateway
       socket['user'] = user; // socket['user'] = socket.user = user
       next();
     } catch (error) {
+      console.log('error', error);
+
       next(new UnauthorizedException('Invalid token'));
     }
   };
@@ -45,7 +51,15 @@ export class MessagesGateway
   }
 
   async handleConnection(@ConnectedSocket() client: SocketWithUser) {
+    console.log('connected');
+
     await this.redis.addUser(client.user, client.id);
+    const unreadPrivateMessages = await this.redis.getUnreceivedMessages(
+      client.user.id,
+    );
+    this.server
+      .to(client.id)
+      .emit('unreadPrivateMessages', unreadPrivateMessages);
   }
 
   afterInit(server: any) {
@@ -73,14 +87,33 @@ export class MessagesGateway
   @SubscribeMessage('message')
   async handleMessage(
     @MessageBody()
-    message: IoMessage,
+    message: IoRoomMessage | IoPrivateMessage,
+    @ConnectedSocket() client: SocketWithUser,
   ): Promise<string> {
-    if (message.room) {
+    if ('room' in message && message.room) {
       this.roomService.sendMessage(this.server.to(message.room), message);
     } else {
-      const socketId = await this.redis.getUserClientId(message.receiver + '');
-      this.server.to(socketId).emit('newMessage', message);
+      console.log('message', message);
+
+      this.roomService.sendToUser(client, message);
     }
     return 'message sent';
+  }
+
+  // Get private messages of user conversation with another user
+  @SubscribeMessage('joinPrivateChat')
+  async handlePingUser(
+    @MessageBody() otherUserId: string,
+    @ConnectedSocket() client: SocketWithUser,
+  ) {
+    const privateMessages = await this.redis.getPrivateMessages(
+      otherUserId,
+      client.user.id,
+    );
+    const peer = await this.redis.getUserInfo(otherUserId);
+    client.emit('onPrivateChat', {
+      oldMessages: privateMessages.reverse(),
+      peer,
+    });
   }
 }

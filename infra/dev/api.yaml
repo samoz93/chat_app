@@ -21,6 +21,14 @@ spec:
           envFrom:
             - configMapRef:
                 name: chat-config
+          volumeMounts:
+            - mountPath: /api/images
+              name: pv-volume
+      volumes:
+        - name: pv-volume
+          persistentVolumeClaim:
+            claimName: pv-claim-api
+
 ---
 apiVersion: v1
 kind: Service

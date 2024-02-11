@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:app/pages/auth_page.dart';
-import 'package:app/pages/chat_page.dart';
 import 'package:app/pages/home_page.dart';
+import 'package:app/pages/private_chat.dart';
+import 'package:app/pages/room_chat.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/stores/auth_store.dart';
 import 'package:app/utils/styles.dart';
@@ -72,10 +73,10 @@ class MyApp extends StatelessWidget {
           ];
         },
         onGenerateRoute: (settings) {
-          if (settings.name == ChatPage.route) {
+          if (settings.name == RoomChatPage.route) {
             final roomId = settings.arguments as String;
             return MaterialPageRoute(
-              builder: (context) => ChatPage(roomId: roomId),
+              builder: (context) => RoomChatPage(roomId: roomId),
             );
           }
           if (settings.name == AuthPage.route) {
@@ -86,6 +87,12 @@ class MyApp extends StatelessWidget {
           if (settings.name == HomePage.route) {
             return MaterialPageRoute(
               builder: (context) => const HomePage(),
+            );
+          }
+          if (settings.name == PrivateChatPage.route) {
+            final peerId = settings.arguments as String;
+            return MaterialPageRoute(
+              builder: (context) => PrivateChatPage(peerId: peerId),
             );
           }
           return null;

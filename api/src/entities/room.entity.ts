@@ -16,6 +16,8 @@ export class RoomEntity extends BaseEntity {
   id: string;
   @Column()
   name: string;
+  @Column()
+  description: string;
 
   @OneToOne(() => UserEntity, {
     cascade: true,

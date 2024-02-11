@@ -8,13 +8,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export interface NewUserInput {
+export class NewUserInput {
     email: string;
     password: string;
     name: string;
 }
 
-export interface User {
+export class User {
     id: string;
     name: string;
     email: string;
@@ -23,12 +23,12 @@ export interface User {
     updatedAt?: Nullable<Date>;
 }
 
-export interface AuthPayload {
+export class AuthPayload {
     token: string;
     user: User;
 }
 
-export interface Message {
+export class Message {
     id: string;
     text: string;
     user: User;
@@ -36,7 +36,7 @@ export interface Message {
     updatedAt?: Nullable<Date>;
 }
 
-export interface ChatRoom {
+export class ChatRoom {
     id: string;
     name: string;
     owner: User;
@@ -44,17 +44,26 @@ export interface ChatRoom {
     messages: Message[];
 }
 
-export interface IQuery {
-    user(id: string): User | Promise<User>;
-    test(): User[] | Promise<User[]>;
-    refresh(): AuthPayload | Promise<AuthPayload>;
+export abstract class IQuery {
+    abstract user(id: string): User | Promise<User>;
+
+    abstract test(): User[] | Promise<User[]>;
+
+    abstract refresh(): AuthPayload | Promise<AuthPayload>;
+
+    abstract getRooms(page?: Nullable<number>, limit?: Nullable<number>): ChatRoom[] | Promise<ChatRoom[]>;
 }
 
-export interface IMutation {
-    updateUser(id: string, name: string, email: string, password: string): User | Promise<User>;
-    deleteUser(id: string): User | Promise<User>;
-    login(email: string, password: string): AuthPayload | Promise<AuthPayload>;
-    signUp(data: NewUserInput): AuthPayload | Promise<AuthPayload>;
+export abstract class IMutation {
+    abstract updateUser(id: string, name: string, email: string, password: string): User | Promise<User>;
+
+    abstract deleteUser(id: string): User | Promise<User>;
+
+    abstract login(email: string, password: string): AuthPayload | Promise<AuthPayload>;
+
+    abstract signUp(data: NewUserInput): AuthPayload | Promise<AuthPayload>;
+
+    abstract createRoom(name: string, description: string): ChatRoom | Promise<ChatRoom>;
 }
 
 type Nullable<T> = T | null;

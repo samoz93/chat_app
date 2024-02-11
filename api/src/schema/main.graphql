@@ -34,6 +34,7 @@ type Query {
   user(id: ID!): User!
   test: [User!]!
   refresh: AuthPayload!
+  getRooms(page: Int, limit: Int): [ChatRoom!]!
 }
 
 input NewUserInput {
@@ -47,4 +48,5 @@ type Mutation {
   deleteUser(id: ID!): User!
   login(email: String!, password: String!): AuthPayload!
   signUp(data: NewUserInput!): AuthPayload!
+  createRoom(name: String!, description: String!): ChatRoom!
 }
