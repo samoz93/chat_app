@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { CONFIG } from './config';
 async function bootstrap() {
+  console.log('CONFIG', CONFIG);
+
   const app = await NestFactory.create(AppModule, {});
   app.use(cookieParser(CONFIG.cookieSecret));
   app.enableCors({

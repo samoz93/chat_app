@@ -1,32 +1,83 @@
-from flask import Flask
-from diffusers import StableDiffusionPipeline
+from flask import Flask,request, jsonify,send_file
+from util.painter import paint
+from util.web_util import token_required
+from util.db_util import can_paint,init_db
+import threading
+import os.path
+from pathlib import Path
+
+
 
 app = Flask(__name__,)
 
+app.config['SECRET_KEY'] = 'samozIsStrugglingWithLife'  # Change this to a secure secret key
+app.config['UPLOAD_FOLDER'] = "rooms"
 
-def paint(prompt):
-    print("Painting...")
-    pipe = StableDiffusionPipeline.from_pretrained(
-        "runwayml/stable-diffusion-v1-5", 
-        use_auth_token=True)
+init_db()
 
-    pipe = pipe.to("mps")
-
-    # Recommended if your computer has < 64 GB of RAM
-    pipe.enable_attention_slicing()
+def getFilePath(userId,room):
+    pth = os.path.join(app.config['UPLOAD_FOLDER'] ,userId)
+    if not os.path.exists(pth):
+        os.makedirs(pth)
+    return pth + "/{}.png".format(room)
 
 
-    # image = pipe("Draw a mushy mushroom, it should be super trippy and realistic",generator=generator).images[0]
-    image = pipe(prompt).images[0]
-    image.save("image_of_squirrel_painting.png")
+@app.route("/", methods=["GET", "POST"])
+@token_required
+def hello_world(user_data):
+    # Get the prompt from the query string
+    room = request.args.get("room")
+    
+    if(not room):
+        return jsonify({"error": "Room not found"}), 400
 
-@app.route("/")
-def hello_world():
-    prompt = "a photo of an astronaut riding a horse on mars"
-    paint(prompt)
-    return "<p>Hello, World!</p>"
+    if request.method == "GET":
+        userId = user_data['id']
+        pth = getFilePath(userId,room)
+        if os.path.isfile(pth):
+            return send_file(pth,mimetype='image/png')
+        return jsonify({"error":"Image not found"}),404    
+    
+    
+    prompt = request.args.get("prompt")
+    
+    if(not prompt):
+        return jsonify({"error": "Prompt not found"}), 400
 
+    # Get the user id from the token
+    userId = user_data['id']
+    
+    # Simple Authorization
+    if not userId:
+        return jsonify({"error": "User not found"}), 401
+    
+    save_path = getFilePath(userId,room)
+
+    # If the user has not requested a painting, create a new job
+    if can_paint(userId,room):
+        threading.Thread(target=paint, args=(prompt,save_path)).start()
+        return jsonify({"status": "Painting in progress"}), 201
+    else:
+        return jsonify({"status":"Painting is on the way"}) if not os.path.isfile(save_path) else send_file(save_path,mimetype='image/png')
+
+@app.route("/rooms")
+@token_required
+def get_rooms(user_data):
+    userId = user_data['id']
+    pth = os.path.join(app.config['UPLOAD_FOLDER'] ,userId)
+    if not os.path.exists(pth):
+        return jsonify({"rooms":[]})
+    return jsonify({"rooms":list(map(lambda x: "{}.png".format(x.stem,),Path(pth).glob("*.png")))})
+
+@app.route("/rooms/<room>")
+@token_required
+def get_room(user_data,room):
+    userId = user_data['id']
+    pth = getFilePath(userId,room)
+    if os.path.isfile(pth):
+        return send_file(pth,mimetype='image/png')
+    return jsonify({"error":"Room not found"}),404
 
 if __name__ == "__main__":
     print("Running app.py")
-    app.run(host="0.0.0.0", port=5000)
+    app.run(port=8000, debug=True)
