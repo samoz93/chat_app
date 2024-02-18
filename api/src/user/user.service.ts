@@ -122,6 +122,7 @@ export class UserService {
 
   async getUserWithRelations(userId: string) {
     const user = await this.userEntity.find({
+      relations: ['friends', 'rooms'],
       where: {
         id: userId,
       },
