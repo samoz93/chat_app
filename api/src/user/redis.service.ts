@@ -139,8 +139,6 @@ export class RedisService {
     message: IoRoomMessage,
   ) {
     const combinedKey = await this.getCombinedKey(sender, receiver);
-    console.log('combinedKey', combinedKey);
-
     this.client.lPush(combinedKey, JSON.stringify(message));
   }
 

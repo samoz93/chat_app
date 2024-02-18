@@ -31,6 +31,22 @@ mixin _$BaseChat<T extends Message> on BaseChatBase<T>, Store {
               name: 'BaseChatBase.messageGroups'))
       .value;
 
+  late final _$unreadCountAtom =
+      Atom(name: 'BaseChatBase.unreadCount', context: context);
+
+  @override
+  int get unreadCount {
+    _$unreadCountAtom.reportRead();
+    return super.unreadCount;
+  }
+
+  @override
+  set unreadCount(int value) {
+    _$unreadCountAtom.reportWrite(value, super.unreadCount, () {
+      super.unreadCount = value;
+    });
+  }
+
   late final _$messagesAtom =
       Atom(name: 'BaseChatBase.messages', context: context);
 
@@ -114,8 +130,20 @@ mixin _$BaseChat<T extends Message> on BaseChatBase<T>, Store {
   }
 
   @override
+  dynamic clearUnread() {
+    final _$actionInfo = _$BaseChatBaseActionController.startAction(
+        name: 'BaseChatBase.clearUnread');
+    try {
+      return super.clearUnread();
+    } finally {
+      _$BaseChatBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
+unreadCount: ${unreadCount},
 messages: ${messages},
 users: ${users},
 totalPages: ${totalPages},

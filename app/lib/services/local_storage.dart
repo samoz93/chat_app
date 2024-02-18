@@ -2,7 +2,7 @@ import 'package:app/models/auth_payload.dart';
 import 'package:app/models/user_dto.dart';
 import 'package:hive/hive.dart';
 
-enum StorageKeys { token, me }
+enum StorageKeys { token, me, refreshToken }
 
 class LocalStorage {
   late Box<dynamic> _usersBox;
@@ -18,8 +18,14 @@ class LocalStorage {
     return _auth.get(StorageKeys.token.toString()) ?? "";
   }
 
+  String get refreshToken {
+    return _auth.get(StorageKeys.refreshToken.toString()) ?? "";
+  }
+
   setAuthState(AuthPayload authState) async {
     await _auth.put(StorageKeys.token.toString(), authState.token);
+    await _auth.put(
+        StorageKeys.refreshToken.toString(), authState.refreshToken);
     await _usersBox.put(StorageKeys.me.toString(), authState.user.toJson());
   }
 

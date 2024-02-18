@@ -1,10 +1,14 @@
 import 'package:app/repos/auth_repo.dart';
 import 'package:app/repos/rooms_repo.dart';
+import 'package:app/services/dio_service.dart';
 import 'package:app/services/graph_client.dart';
 import 'package:app/services/local_storage.dart';
 import 'package:app/services/socket.io.dart';
 import 'package:app/stores/auth_store.dart';
+import 'package:app/stores/friends_manager.dart';
 import 'package:app/stores/main_store.dart';
+import 'package:app/stores/rooms_manager.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -15,43 +19,21 @@ Future<void> setup() async {
   it.allowReassignment = kDebugMode;
   await Hive.initFlutter();
 
+  final storage = LocalStorage();
+  await storage.init();
+
   // Local storage
-  it.registerSingletonAsync<LocalStorage>(() async {
-    final storage = LocalStorage();
-    await storage.init();
-    return storage;
-  });
-
+  it.registerSingleton<LocalStorage>(storage);
+  it.registerSingleton<Dio>(getDioClient());
   // Socket service, will depend on local storage
-  it.registerSingletonWithDependencies<SocketService>(
-    () {
-      return SocketService();
-    },
-    dependsOn: [LocalStorage],
-  );
-
-  it.registerSingletonWithDependencies<GraphClient>(
-    () => GraphClient(),
-    dependsOn: [LocalStorage],
-  );
-
-  it.registerSingletonWithDependencies<AuthRepo>(
-    () => AuthRepo(),
-    dependsOn: [GraphClient],
-  );
-
-  it.registerSingletonWithDependencies<AuthStore>(
-    () => AuthStore(),
-    dependsOn: [AuthRepo],
-  );
-
-  it.registerSingletonWithDependencies(() {
-    return RoomsRepo();
-  }, dependsOn: [LocalStorage]);
-
-  it.registerSingletonWithDependencies(() {
-    return MainStore();
-  }, dependsOn: [LocalStorage]);
+  it.registerSingleton(SocketService());
+  it.registerSingleton(GraphClient());
+  it.registerSingleton(AuthRepo());
+  it.registerSingleton(ChatRepo());
+  it.registerSingleton<FriendsManager>(FriendsManager());
+  it.registerSingleton<RoomsManager>(RoomsManager());
+  it.registerSingleton(AuthStore());
+  it.registerSingleton(MainStore());
 
   await it.allReady();
 }

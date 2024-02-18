@@ -1,9 +1,12 @@
 import 'package:app/components/carousel.dart';
 import 'package:app/components/custom_input.dart';
+import 'package:app/components/private_chat_tile.dart';
 import 'package:app/helpers/carousel_item.dart';
+import 'package:app/repos/auth_repo.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/services/socket.io.dart';
 import 'package:app/stores/auth_store.dart';
+import 'package:app/stores/friends_manager.dart';
 import 'package:app/stores/main_store.dart';
 import 'package:app/utils/extensions.dart';
 import 'package:flutter/material.dart';
@@ -20,9 +23,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _store = it.get<AuthStore>();
+  final _repo = it.get<AuthRepo>();
   final _mainStore = it.get<MainStore>();
   final _io = it.get<SocketService>();
-
+  final _friendsManager = it.get<FriendsManager>();
   Widget get _spacer => SizedBox(height: 15.sp);
   @override
   void initState() {
@@ -69,7 +73,24 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(
                   child: Carousel(
                     items: items,
-                    title: "Favourite",
+                    title: "Rooms",
+                  ),
+                ),
+                Flexible(
+                  flex: 1,
+                  child: Observer(
+                    builder: (context) {
+                      return ListView.builder(
+                        itemCount: _friendsManager.friends.length,
+                        itemBuilder: (ctx, idx) {
+                          final friend = _friendsManager.friends.elementAt(idx);
+                          return PrivateChatTile(
+                            user: friend,
+                            unreadCount: 1,
+                          );
+                        },
+                      );
+                    },
                   ),
                 ),
               ],
@@ -105,7 +126,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
             onPressed: () {
-              _store.signout();
+              _repo.refreshToken();
             },
             child: const Icon(Icons.add),
           ),

@@ -2,6 +2,8 @@ import 'package:app/models/auth_payload.dart';
 import 'package:app/models/user_dto.dart';
 import 'package:app/repos/auth_repo.dart';
 import 'package:app/services/locator.dart';
+import 'package:app/stores/friends_manager.dart';
+import 'package:app/stores/rooms_manager.dart';
 import 'package:app/utils/await_to_dart.dart';
 import 'package:mobx/mobx.dart';
 
@@ -15,6 +17,11 @@ abstract class _AuthStore with Store {
   _AuthStore() {
     token = _repo.token;
     me = _repo.me;
+
+    when((p0) => isLoggedIn, () {
+      it.get<FriendsManager>().initState();
+      it.get<RoomsManager>().initState();
+    });
   }
 
   @observable

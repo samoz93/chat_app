@@ -8,6 +8,7 @@ import 'package:app/models/private_chat_dto.dart';
 import 'package:app/models/private_messsage_dto.dart';
 import 'package:app/models/room_events_dto.dart';
 import 'package:app/models/sealed_classes.dart';
+import 'package:app/models/user_dto.dart';
 import 'package:app/services/local_storage.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/utils/prettyprint.dart';
@@ -23,12 +24,14 @@ class SocketService {
   final _oldRoomMessagesControllers =
       StreamController<OldMessagesDto>.broadcast();
   final _privateChatController = StreamController<PrivateChatDto>.broadcast();
+  final _friendsController = StreamController<User>.broadcast();
 
   Stream<Message> get newMessageStream => _newMessageController.stream;
   Stream<OldMessagesDto> get oldRoomMessages =>
       _oldRoomMessagesControllers.stream;
   Stream<RoomsEventsDto> get roomUsersStream => _roomEventsController.stream;
   Stream<PrivateChatDto> get privateChatStream => _privateChatController.stream;
+  Stream<User> get friendsStream => _friendsController.stream;
 
   SocketService();
 
@@ -95,10 +98,10 @@ class SocketService {
       _oldRoomMessagesControllers.add(oldRoomMessages);
     });
 
-    // socket?.on("unreadPrivateMessages", (data) {
-    //   final message = (data as List).map((e) => PrivateMessageDto.fromJson(e));
-    //   _missingPrivateMessageStream.add(message.toList());
-    // });
+    socket?.on("onNewFriend", (data) {
+      final user = User.fromJson(data['user']);
+      _friendsController.sink.add(user);
+    });
 
     socket?.on("onPrivateChat", (data) {
       final chat = PrivateChatDto.fromJson(data);

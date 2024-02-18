@@ -5,7 +5,6 @@ import 'package:app/models/user_dto.dart';
 import 'package:app/services/local_storage.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/services/socket.io.dart';
-import 'package:app/utils/prettyprint.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
@@ -31,6 +30,9 @@ abstract class BaseChatBase<T extends Message> with Store {
   @protected
   final List<StreamSubscription<dynamic>> disposers = [];
 
+  @observable
+  int unreadCount = 0;
+
   @protected
   final me = it.get<LocalStorage>().me!;
 
@@ -38,8 +40,8 @@ abstract class BaseChatBase<T extends Message> with Store {
     final dis2 = io.newMessageStream
         .where((event) => event is T && filter(event))
         .listen((message) {
-      prettyPrint("new", message.runtimeType);
       appendMessage(message as T);
+      unreadCount += 1;
     });
 
     disposers.add(dis2);
@@ -167,4 +169,9 @@ abstract class BaseChatBase<T extends Message> with Store {
   }
 
   sendMessage(String text);
+
+  @action
+  clearUnread() {
+    unreadCount = 0;
+  }
 }

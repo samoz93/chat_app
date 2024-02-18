@@ -8,6 +8,7 @@ part of 'auth_payload.dart';
 class _$AuthPayloadImpl extends AuthPayload {
   _$AuthPayloadImpl({
     required this.token,
+    required this.refreshToken,
     required this.user,
   }) : super.ctor();
 
@@ -15,11 +16,15 @@ class _$AuthPayloadImpl extends AuthPayload {
   final String token;
 
   @override
+  final String refreshToken;
+
+  @override
   final User user;
 
   factory _$AuthPayloadImpl.fromJson(Map<dynamic, dynamic> json) {
     return _$AuthPayloadImpl(
       token: json['token'] as String,
+      refreshToken: json['refreshToken'] as String,
       user: User.fromJson(json['user']),
     );
   }
@@ -28,6 +33,7 @@ class _$AuthPayloadImpl extends AuthPayload {
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'token': token,
+      'refreshToken': refreshToken,
       'user': user.toJson(),
     };
   }
@@ -38,6 +44,7 @@ class _$AuthPayloadImpl extends AuthPayload {
         other is AuthPayload &&
             runtimeType == other.runtimeType &&
             token == other.token &&
+            refreshToken == other.refreshToken &&
             user == other.user;
   }
 
@@ -46,6 +53,7 @@ class _$AuthPayloadImpl extends AuthPayload {
     return Object.hashAll(<Object?>[
       runtimeType,
       token,
+      refreshToken,
       user,
     ]);
   }
@@ -54,7 +62,8 @@ class _$AuthPayloadImpl extends AuthPayload {
   String toString() {
     String toStringOutput = 'AuthPayload{<optimized out>}';
     assert(() {
-      toStringOutput = 'AuthPayload@<$hexIdentity>{token: $token, user: $user}';
+      toStringOutput =
+          'AuthPayload@<$hexIdentity>{token: $token, refreshToken: $refreshToken, user: $user}';
       return true;
     }());
     return toStringOutput;
@@ -67,10 +76,13 @@ class _$AuthPayloadImpl extends AuthPayload {
 abstract interface class _AuthPayloadCopyWithProxy {
   AuthPayload token(String newValue);
 
+  AuthPayload refreshToken(String newValue);
+
   $UserCopyWithProxyChain<AuthPayload> get user;
 
   AuthPayload call({
     final String? token,
+    final String? refreshToken,
     final User? user,
   });
 }
@@ -86,6 +98,10 @@ class _AuthPayloadCopyWithProxyImpl implements _AuthPayloadCopyWithProxy {
 
   @pragma('vm:prefer-inline')
   @override
+  AuthPayload refreshToken(String newValue) => this(refreshToken: newValue);
+
+  @pragma('vm:prefer-inline')
+  @override
   $UserCopyWithProxyChain<AuthPayload> get user =>
       $UserCopyWithProxyChain<AuthPayload>(
           _value.user, (User update) => this(user: update));
@@ -94,10 +110,12 @@ class _AuthPayloadCopyWithProxyImpl implements _AuthPayloadCopyWithProxy {
   @override
   AuthPayload call({
     final String? token,
+    final String? refreshToken,
     final User? user,
   }) {
     return _$AuthPayloadImpl(
       token: token ?? _value.token,
+      refreshToken: refreshToken ?? _value.refreshToken,
       user: user ?? _value.user,
     );
   }
@@ -110,10 +128,13 @@ sealed class $AuthPayloadCopyWithProxyChain<$Result> {
 
   $Result token(String newValue);
 
+  $Result refreshToken(String newValue);
+
   $Result user(User newValue);
 
   $Result call({
     final String? token,
+    final String? refreshToken,
     final User? user,
   });
 }
@@ -131,16 +152,22 @@ class _AuthPayloadCopyWithProxyChainImpl<$Result>
 
   @pragma('vm:prefer-inline')
   @override
+  $Result refreshToken(String newValue) => this(refreshToken: newValue);
+
+  @pragma('vm:prefer-inline')
+  @override
   $Result user(User newValue) => this(user: newValue);
 
   @pragma('vm:prefer-inline')
   @override
   $Result call({
     final String? token,
+    final String? refreshToken,
     final User? user,
   }) {
     return _chain(_$AuthPayloadImpl(
       token: token ?? _value.token,
+      refreshToken: refreshToken ?? _value.refreshToken,
       user: user ?? _value.user,
     ));
   }

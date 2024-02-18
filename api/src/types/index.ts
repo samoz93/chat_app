@@ -25,6 +25,10 @@ export interface IoMessageEnterOrExit extends ICommon {
   users: UserEntity[];
 }
 
+export interface IoNewFriend {
+  user: UserEntity;
+}
+
 export type ServerToClientTypes = {
   newMessage: (opt: IoRoomMessage) => void;
   newPrivateMessage: (opt: IoPrivateMessage) => void;
@@ -32,6 +36,7 @@ export type ServerToClientTypes = {
   newRoom: (opt: string) => void;
   removeRoom: (opt: string) => void;
   unreadPrivateMessages: (opt: IoPrivateMessage[]) => void;
+  onNewFriend: (opt: IoNewFriend) => void;
 };
 
 export const REFRESH_TOKEN = 'refreshToken';

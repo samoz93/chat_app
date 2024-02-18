@@ -10,13 +10,14 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { TokenService } from 'src/shared/token.service';
 import {
   IoPrivateMessage,
   IoRoomMessage,
   ServerToClientTypes,
 } from 'src/types';
 import { RedisService } from 'src/user/redis.service';
-import { TokenService } from 'src/utils';
+import { UserService } from 'src/user/user.service';
 import { RoomClientService } from './room.client.service';
 import { SocketWithUser } from './types';
 
@@ -29,13 +30,10 @@ export class MessagesGateway
       const user = await this.tokenService.validateToken(
         socket.handshake.headers,
       );
-      console.log('user', user);
 
       socket['user'] = user; // socket['user'] = socket.user = user
       next();
     } catch (error) {
-      console.log('error', error);
-
       next(new UnauthorizedException('Invalid token'));
     }
   };
@@ -43,6 +41,7 @@ export class MessagesGateway
     private tokenService: TokenService,
     private redis: RedisService,
     private roomService: RoomClientService,
+    private userService: UserService,
   ) {}
   clients = [];
   @WebSocketServer()
@@ -108,10 +107,32 @@ export class MessagesGateway
       otherUserId,
       client.user.id,
     );
+    // Add friends together
+    this.handleFriendship(client.user.id, otherUserId);
+
+    // Start new chat by sending previous chats
     const peer = await this.redis.getUserInfo(otherUserId);
     client.emit('onPrivateChat', {
       oldMessages: privateMessages.reverse(),
       peer,
+    });
+  }
+
+  private async handleFriendship(userId: string, friendId: string) {
+    // Notify both friends about this new friendship
+    const data = await this.userService.addFriend(userId, friendId);
+    if (!data) return;
+
+    const [user, friend] = data;
+    this.server.to(userId).emit('onNewFriend', {
+      user,
+    });
+
+    const peerId = await this.redis.getUserClientId(friendId);
+    if (!peerId) return;
+
+    this.server.to(peerId).emit('onNewFriend', {
+      user: friend,
     });
   }
 }

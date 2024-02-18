@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/entities/user.entity';
 import { AuthPayload } from 'src/schema/graphql';
-import { TokenService, sanitizeUser } from 'src/utils';
+import { TokenService } from 'src/shared/token.service';
+import { sanitizeUser } from 'src/utils';
 import { Repository } from 'typeorm';
 @Injectable()
 export class AuthService {

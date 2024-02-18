@@ -24,4 +24,8 @@ export class UserEntity extends BaseEntity {
   })
   @JoinTable()
   rooms?: RoomEntity[];
+
+  @ManyToMany(() => UserEntity, (user) => user)
+  @JoinTable()
+  friends?: UserEntity[];
 }

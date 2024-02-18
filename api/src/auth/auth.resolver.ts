@@ -1,11 +1,12 @@
 import { HttpException, UseFilters } from '@nestjs/common';
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { Request, Response } from 'express';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Response } from 'express';
 import { HttpExceptionFilter } from 'src/http-exception-filter/http-exception-filter.filter';
 import { AuthPayload, NewUserInput } from 'src/schema/graphql';
+import { TokenService } from 'src/shared/token.service';
 import { JWT_TOKEN, REFRESH_TOKEN } from 'src/types';
 import { UserService } from 'src/user/user.service';
-import { GraphResponse, TokenService } from 'src/utils';
+import { GraphResponse } from 'src/utils';
 import { AuthService } from './auth.service';
 @Resolver('Auth')
 @UseFilters(new HttpExceptionFilter())
@@ -33,9 +34,13 @@ export class AuthResolver {
     res.cookie(REFRESH_TOKEN, authPayload.refreshToken);
     res.cookie(JWT_TOKEN, authPayload.token);
 
+    const fullUser = await this.userService.getUserWithRelations(
+      authPayload.user.id,
+    );
+
     return {
-      token: authPayload.token,
-      user: authPayload.user,
+      ...authPayload,
+      user: fullUser,
     };
   }
 
@@ -57,17 +62,15 @@ export class AuthResolver {
 
     return {
       user,
-      token: jwt.token,
+      ...jwt,
     };
   }
 
   @Query('refresh')
   async refreshToken(
-    @Context('req') req: Request,
+    @Args('refreshToken') refreshToken: string,
     @GraphResponse() res: Response,
   ): Promise<AuthPayload> {
-    const refreshToken = req.cookies[REFRESH_TOKEN];
-
     if (!refreshToken) {
       throw new HttpException('Invalid refresh token', 401);
     }
@@ -80,7 +83,7 @@ export class AuthResolver {
 
     return {
       user,
-      token: jwt.token,
+      ...jwt,
     };
   }
 

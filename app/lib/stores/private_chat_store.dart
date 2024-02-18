@@ -2,6 +2,7 @@ import 'package:app/models/private_messsage_dto.dart';
 import 'package:app/services/local_storage.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/stores/base_chat.dart';
+import 'package:app/utils/prettyprint.dart';
 import 'package:mobx/mobx.dart';
 
 part 'private_chat_store.g.dart';
@@ -21,6 +22,7 @@ abstract class PrivateChatStoreBase extends BaseChat<PrivateMessageDto>
   }
 
   PrivateChatStoreBase({required this.peerId}) {
+    prettyPrint(peerId);
     joinChat();
     // Get other user information
     // Get old Messages
@@ -36,8 +38,8 @@ abstract class PrivateChatStoreBase extends BaseChat<PrivateMessageDto>
 
   @override
   @action
-  void sendMessage(String message) {
-    io.sendMessageToUser(message, peerId);
+  void sendMessage(String text) {
+    io.sendMessageToUser(text, peerId);
   }
 
   @action

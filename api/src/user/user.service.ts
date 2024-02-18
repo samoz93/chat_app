@@ -36,9 +36,12 @@ export class UserService {
       throw new Error('User or room not found');
     }
     if (!user.rooms) user.rooms = [room];
-    else user.rooms.push(room);
+    else {
+      if (user.rooms!.filter((e) => e.id === roomId)) return user;
+      user.rooms.push(room);
+    }
 
-    await this.userEntity.save(user);
+    return await this.userEntity.save(user);
   }
 
   async removeRoomFromUser(userId: string, roomId: string) {
@@ -48,17 +51,42 @@ export class UserService {
       throw new Error('User or room not found');
     }
 
-    user.rooms = user.rooms.filter((r) => r.id !== room.id);
+    user.rooms = user.rooms?.filter((r) => r.id !== room.id) ?? [];
 
     await this.userEntity.save(user);
   }
 
+  addFriend = async (userId: string, friendId: string) => {
+    const user1 = await this.getUserWithRelations(userId);
+    const user2 = await this.userEntity.findOneBy({
+      id: friendId,
+    });
+
+    if (user1.friends?.find((f) => f.id === friendId)) {
+      return;
+    }
+
+    if (!user1 || !user2) {
+      throw new Error("Can't find the people you're searching for");
+    }
+
+    await this.userEntity.manager.transaction(async (entity) => {
+      console.log('user1', user1.friends);
+
+      user1.friends = Array.from(new Set([...(user1.friends ?? []), user2]));
+      user2.friends = Array.from(new Set([...(user2.friends ?? []), user1]));
+      await entity.save(user1);
+      await entity.save(user2);
+    });
+
+    return [user1, user2];
+  };
+
   async getUserById(id: string) {
-    return this.userEntity
-      .findOneBy({
-        id,
-      })
-      .then(sanitizeUser);
+    const data = await this.userEntity.findOneBy({
+      id,
+    });
+    return sanitizeUser(data);
   }
 
   deleteUser(id: string) {
@@ -90,5 +118,16 @@ export class UserService {
 
   async userExists(email: string) {
     return this.userEntity.findOneBy({ email }).then((user) => !!user);
+  }
+
+  async getUserWithRelations(userId: string) {
+    const user = await this.userEntity.find({
+      relations: ['friends', 'rooms'],
+      where: {
+        id: userId,
+      },
+    });
+
+    return user[0];
   }
 }

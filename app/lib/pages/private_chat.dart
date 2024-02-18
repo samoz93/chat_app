@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:app/components/chat_sliver.dart';
 import 'package:app/components/user_avatar.dart';
 import 'package:app/models/admin_mesage_dto.dart';
+import 'package:app/services/locator.dart';
+import 'package:app/stores/friends_manager.dart';
 import 'package:app/stores/private_chat_store.dart';
 import 'package:app/utils/throttler.dart';
 import 'package:flutter/material.dart';
@@ -26,13 +28,15 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
   late ReactionDisposer dis;
   @override
   void initState() {
-    _store = PrivateChatStore(peerId: widget.peerId);
+    _store = it.get<FriendsManager>().stores[widget.peerId]!;
+
     Future.delayed(500.ms, () {
       _scrlCtrl.jumpTo(
         _scrlCtrl.position.maxScrollExtent,
       );
     });
     _scrlCtrl.addListener(scrollListener);
+
     dis = autorun((_) {
       final finalMessage = _store.messages.last;
       if (finalMessage is AdminMessage) return;

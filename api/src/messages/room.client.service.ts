@@ -102,7 +102,7 @@ export class RoomClientService {
       .emit('roomEvents', { room, users: users });
 
     // Add the room to the user list
-    this.userService.removeRoomFromUser(client.user.id, room);
+    // this.userService.removeRoomFromUser(client.user.id, room);
 
     return `${client.user.name} Left ${room}`;
   }

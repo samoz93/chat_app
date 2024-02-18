@@ -42,7 +42,7 @@ class _AuthPageState extends State<AuthPage>
     border: OutlineInputBorder(),
   );
   Key _refreshKey = UniqueKey();
-  final service = it.get<AuthStore>();
+  final _authStore = it.get<AuthStore>();
   var mode = AuthMode.signIn;
   final _key = GlobalKey<FormState>();
   void submit() async {
@@ -53,12 +53,12 @@ class _AuthPageState extends State<AuthPage>
     var err, data;
 
     if (mode == AuthMode.signIn) {
-      (err, data) = await service.login(
+      (err, data) = await _authStore.login(
         emailField.value,
         passwordField.value,
       );
     } else if (mode == AuthMode.signUp) {
-      (err, data) = await service.signup(
+      (err, data) = await _authStore.signup(
         email: emailField.value,
         name: nameField.value,
         password: passwordField.value,
@@ -82,7 +82,6 @@ class _AuthPageState extends State<AuthPage>
   var _ticker;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _ticker ??= createTicker((elapsed) {
       final double elapsedSeconds = elapsed.inMilliseconds / 1000;

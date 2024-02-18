@@ -16,9 +16,11 @@ abstract class AuthPayload {
   factory AuthPayload({
     required String token,
     required User user,
+    required String refreshToken,
   }) = _$AuthPayloadImpl;
 
   String get token;
+  String get refreshToken;
   User get user;
 
   /// Creates an instance of [AuthPayload] from [json]

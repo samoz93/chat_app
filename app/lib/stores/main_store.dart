@@ -10,7 +10,7 @@ class MainStore = MainStoreBase with _$MainStore;
 
 abstract class MainStoreBase with Store {
   final _storage = it.get<LocalStorage>();
-  final _roomRepo = it.get<RoomsRepo>();
+  final _roomRepo = it.get<ChatRepo>();
 
   init() async {
     loading = true;

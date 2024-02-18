@@ -15,7 +15,8 @@
       "name": "app ios",
       "cwd": "app",
       "request": "launch",
-      "type": "dart"
+      "type": "dart",
+      "deviceId": "E8AFA47A-B431-4025-B646-2FD094334728"
     },
     {
       "name": "app (profile mode)",

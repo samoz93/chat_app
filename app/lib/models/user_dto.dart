@@ -16,14 +16,14 @@ abstract class User {
   /// Default constructor
   factory User({
     required String id,
-    required String email,
+    String email,
     required String name,
   }) = _$UserImpl;
 
   @HiveField(0)
   String get id;
   @HiveField(1)
-  String get email;
+  String? get email;
   @HiveField(2)
   String get name;
 

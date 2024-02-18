@@ -26,6 +26,7 @@ export class User {
 
 export class AuthPayload {
     token: string;
+    refreshToken: string;
     user: User;
 }
 
@@ -51,9 +52,11 @@ export abstract class IQuery {
 
     abstract test(): User[] | Promise<User[]>;
 
-    abstract refresh(): AuthPayload | Promise<AuthPayload>;
+    abstract refresh(refreshToken?: Nullable<string>): AuthPayload | Promise<AuthPayload>;
 
     abstract getRooms(page?: Nullable<number>, limit?: Nullable<number>): ChatRoom[] | Promise<ChatRoom[]>;
+
+    abstract getFriends(): User[] | Promise<User[]>;
 }
 
 export abstract class IMutation {

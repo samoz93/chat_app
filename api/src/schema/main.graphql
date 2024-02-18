@@ -7,10 +7,12 @@ type User {
   rooms: [ChatRoom]
   createdAt: Date
   updatedAt: Date
+  friends: [User]
 }
 
 type AuthPayload {
   token: String!
+  refreshToken: String!
   user: User!
 }
 
@@ -34,8 +36,9 @@ type ChatRoom {
 type Query {
   user(id: ID!): User!
   test: [User!]!
-  refresh: AuthPayload!
+  refresh(refreshToken: String): AuthPayload!
   getRooms(page: Int, limit: Int): [ChatRoom!]!
+  getFriends: [User!]!
 }
 
 input NewUserInput {

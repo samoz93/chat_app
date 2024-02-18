@@ -8,7 +8,7 @@ part of 'user_dto.dart';
 class _$UserImpl extends User {
   _$UserImpl({
     required this.id,
-    required this.email,
+    this.email,
     required this.name,
   }) : super.ctor();
 
@@ -16,7 +16,7 @@ class _$UserImpl extends User {
   final String id;
 
   @override
-  final String email;
+  final String? email;
 
   @override
   final String name;
@@ -24,7 +24,7 @@ class _$UserImpl extends User {
   factory _$UserImpl.fromJson(Map<dynamic, dynamic> json) {
     return _$UserImpl(
       id: json['id'] as String,
-      email: json['email'] as String,
+      email: json['email'] as String?,
       name: json['name'] as String,
     );
   }
@@ -76,7 +76,7 @@ class _$UserImpl extends User {
 abstract interface class _UserCopyWithProxy {
   User id(String newValue);
 
-  User email(String newValue);
+  User email(String? newValue);
 
   User name(String newValue);
 
@@ -98,7 +98,7 @@ class _UserCopyWithProxyImpl implements _UserCopyWithProxy {
 
   @pragma('vm:prefer-inline')
   @override
-  User email(String newValue) => this(email: newValue);
+  User email(String? newValue) => this(email: newValue);
 
   @pragma('vm:prefer-inline')
   @override
@@ -108,12 +108,13 @@ class _UserCopyWithProxyImpl implements _UserCopyWithProxy {
   @override
   User call({
     final String? id,
-    final String? email,
+    final Object? email = const Object(),
     final String? name,
   }) {
     return _$UserImpl(
       id: id ?? _value.id,
-      email: email ?? _value.email,
+      email:
+          identical(email, const Object()) ? _value.email : (email as String?),
       name: name ?? _value.name,
     );
   }
@@ -126,7 +127,7 @@ sealed class $UserCopyWithProxyChain<$Result> {
 
   $Result id(String newValue);
 
-  $Result email(String newValue);
+  $Result email(String? newValue);
 
   $Result name(String newValue);
 
@@ -150,7 +151,7 @@ class _UserCopyWithProxyChainImpl<$Result>
 
   @pragma('vm:prefer-inline')
   @override
-  $Result email(String newValue) => this(email: newValue);
+  $Result email(String? newValue) => this(email: newValue);
 
   @pragma('vm:prefer-inline')
   @override
@@ -160,12 +161,13 @@ class _UserCopyWithProxyChainImpl<$Result>
   @override
   $Result call({
     final String? id,
-    final String? email,
+    final Object? email = const Object(),
     final String? name,
   }) {
     return _chain(_$UserImpl(
       id: id ?? _value.id,
-      email: email ?? _value.email,
+      email:
+          identical(email, const Object()) ? _value.email : (email as String?),
       name: name ?? _value.name,
     ));
   }

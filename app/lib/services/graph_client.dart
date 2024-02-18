@@ -5,10 +5,10 @@ import 'package:graphql/client.dart';
 
 class GraphClient {
   final localStorage = GetIt.I.get<LocalStorage>();
-  final _httpLink = HttpLink(Config.GRAPH_BASE_URL);
 
   late GraphQLClient client;
   GraphClient() {
+    final httpLink = HttpLink(Config.GRAPH_BASE_URL);
     final authLink = AuthLink(
       getToken: () {
         return 'Bearer ${localStorage.token}';
@@ -17,7 +17,7 @@ class GraphClient {
 
     client = GraphQLClient(
       cache: GraphQLCache(),
-      link: authLink.concat(_httpLink),
+      link: authLink.concat(httpLink),
     );
   }
 }

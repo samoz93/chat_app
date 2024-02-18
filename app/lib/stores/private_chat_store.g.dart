@@ -13,11 +13,11 @@ mixin _$PrivateChatStore on PrivateChatStoreBase, Store {
       ActionController(name: 'PrivateChatStoreBase', context: context);
 
   @override
-  void sendMessage(String message) {
+  void sendMessage(String text) {
     final _$actionInfo = _$PrivateChatStoreBaseActionController.startAction(
         name: 'PrivateChatStoreBase.sendMessage');
     try {
-      return super.sendMessage(message);
+      return super.sendMessage(text);
     } finally {
       _$PrivateChatStoreBaseActionController.endAction(_$actionInfo);
     }

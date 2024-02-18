@@ -1,12 +1,12 @@
-import { Injectable, Scope, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CONFIG } from 'src/config';
 import { UserEntity } from 'src/entities/user.entity';
+import { UserService } from 'src/user/user.service';
 
-@Injectable({
-  scope: Scope.TRANSIENT,
-})
+@Injectable()
 export class TokenService {
+  constructor(private userService: UserService) {}
   private jwtService = new JwtService({
     secret: CONFIG.jwtSecret,
     global: true,
@@ -31,11 +31,10 @@ export class TokenService {
 
     try {
       user = await this.jwtService.verifyAsync<UserEntity>(tokenString);
+      return await this.userService.getUserById(user.id);
     } catch (error) {
       throw new UnauthorizedException('Invalid token');
     }
-
-    return user;
   };
 
   validateRefreshToken = async (tokenString: string) => {
