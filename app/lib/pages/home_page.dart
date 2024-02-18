@@ -97,9 +97,7 @@ class _HomePageState extends State<HomePage> {
                       child: Text("No friends found"),
                     ));
                   }
-                  var friends = _friendsManager.friends.toList();
-                  friends = [...friends, ...friends, ...friends, ...friends];
-                  friends = [...friends, ...friends, ...friends, ...friends];
+                  final friends = _friendsManager.friends.toList();
                   return SliverList.builder(
                     itemBuilder: (ctx, idx) {
                       final friend = friends.elementAt(idx);

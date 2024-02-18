@@ -78,6 +78,10 @@ class _CustomInputState extends State<CustomInput> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      constraints: BoxConstraints(
+        minHeight: 30.sp,
+        maxHeight: widget.isExpanded ? 45.sp : 40.sp,
+      ),
       margin: EdgeInsets.symmetric(vertical: 8.sp),
       child: TextFormField(
         onChanged: _onChanged,
@@ -173,7 +177,7 @@ class IconBox extends StatelessWidget {
         return Icon(
           icon,
           color: color,
-          size: ctx.maxHeight * 0.35,
+          size: ctx.maxHeight * 0.3,
         );
       }),
     );

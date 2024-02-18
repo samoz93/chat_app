@@ -124,15 +124,16 @@ class _AuthPageState extends State<AuthPage>
                 color:
                     Theme.of(context).scaffoldBackgroundColor.withOpacity(.9),
                 child: Center(
-                  child: SingleChildScrollView(
-                    child: Form(
-                      key: _key,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            height: 30.h,
-                            child: WidgetMask(
+                  child: Form(
+                    key: _key,
+                    child: SingleChildScrollView(
+                      child: SizedBox(
+                        height: 100.h,
+                        child: Flex(
+                          direction: Axis.vertical,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            WidgetMask(
                               mask: CustomPaint(
                                 painter: ShaderPainter(
                                   shader: shader,
@@ -154,62 +155,65 @@ class _AuthPageState extends State<AuthPage>
                                 ),
                               ),
                             ),
-                          ),
-                          Column(
-                            key: _refreshKey,
-                            children: [
-                              ...inputs.map(
-                                (e) {
-                                  return Container(
-                                    margin:
-                                        const EdgeInsets.symmetric(vertical: 8),
-                                    child: CustomInput(
-                                      label: e.label,
-                                      validator: e.validator,
-                                      onChanged: (value) {
-                                        e.value = value;
-                                      },
-                                      prefixIcon: Icons.email,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ]
-                                .animate(
-                                  interval: .1.seconds,
-                                )
-                                .shakeX(),
-                          ),
-                          SizedBox(
-                            child: Column(
+                            Column(
+                              key: _refreshKey,
                               children: [
-                                ElevatedButton(
-                                  onPressed: submit,
-                                  child: Text(
-                                    mode == AuthMode.signIn
-                                        ? "Sign In"
-                                        : "Sign Up",
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _refreshKey = UniqueKey();
-                                      mode = mode == AuthMode.signIn
-                                          ? AuthMode.signUp
-                                          : AuthMode.signIn;
-                                    });
+                                ...inputs.map(
+                                  (e) {
+                                    return Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 8),
+                                      child: CustomInput(
+                                        label: e.label,
+                                        validator: e.validator,
+                                        onChanged: (value) {
+                                          e.value = value;
+                                        },
+                                        prefixIcon: Icons.email,
+                                        isExpanded: false,
+                                      ),
+                                    );
                                   },
-                                  child: Text(
-                                    mode == AuthMode.signIn
-                                        ? "Don't have an account? Sign Up"
-                                        : "Already have an account? Sign In",
-                                  ),
                                 ),
-                              ],
+                              ]
+                                  .animate(
+                                    interval: .1.seconds,
+                                  )
+                                  .shakeX(),
                             ),
-                          )
-                        ],
+                            Flexible(
+                              flex: 1,
+                              fit: FlexFit.loose,
+                              child: Column(
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: submit,
+                                    child: Text(
+                                      mode == AuthMode.signIn
+                                          ? "Sign In"
+                                          : "Sign Up",
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _refreshKey = UniqueKey();
+                                        mode = mode == AuthMode.signIn
+                                            ? AuthMode.signUp
+                                            : AuthMode.signIn;
+                                      });
+                                    },
+                                    child: Text(
+                                      mode == AuthMode.signIn
+                                          ? "Don't have an account? Sign Up"
+                                          : "Already have an account? Sign In",
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   ),
