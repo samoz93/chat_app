@@ -33,7 +33,6 @@ import { UserModule } from './user/user.module';
       formatError: (err) => {
         return {
           message: err.message,
-          path: err.path,
         };
       },
       // context: ({ req, res }) => ({ req, res }),

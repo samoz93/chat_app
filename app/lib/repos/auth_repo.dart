@@ -5,6 +5,7 @@ import 'package:app/models/user_dto.dart';
 import 'package:app/services/graph_client.dart';
 import 'package:app/services/local_storage.dart';
 import 'package:app/services/locator.dart';
+import 'package:app/utils/prettyprint.dart';
 import 'package:graphql/client.dart';
 
 class AuthRepo {
@@ -28,6 +29,7 @@ class AuthRepo {
 
     final QueryResult result = await _graphClient.client.mutate(options);
     if (result.hasException) {
+      prettyPrint(result.exception);
       throw ChatException(exception: result.exception!);
     }
 
