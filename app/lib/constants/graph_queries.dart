@@ -23,3 +23,13 @@ mutation signUp($email: String!, $password: String!, $name: String!) {
     }
 }
 ''';
+
+const getRoomsQuery = r'''
+query GetRooms {
+    getRooms {
+        id
+        name
+        description
+    }
+}
+''';

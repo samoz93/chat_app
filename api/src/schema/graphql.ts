@@ -39,6 +39,7 @@ export class Message {
 export class ChatRoom {
     id: string;
     name: string;
+    description: string;
     owner: User;
     users: User[];
     messages: Message[];

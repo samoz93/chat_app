@@ -25,6 +25,7 @@ type Message {
 type ChatRoom {
   id: ID!
   name: String!
+  description: String!
   owner: User!
   users: [User!]!
   messages: [Message!]!

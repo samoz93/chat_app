@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { RoomEntity } from 'src/entities/room.entity';
+import { UserEntity } from 'src/entities/user.entity';
 import { RedisService } from 'src/user/redis.service';
 import { TokenService } from 'src/utils';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([UserEntity, RoomEntity])],
   providers: [
     TokenService,
-
     {
       provide: RedisService,
       useFactory: async () => {
@@ -19,6 +22,6 @@ import { TokenService } from 'src/utils';
       },
     },
   ],
-  exports: [TokenService, RedisService],
+  exports: [TokenService, RedisService, TypeOrmModule],
 })
 export class SharedModule {}

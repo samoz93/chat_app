@@ -15,12 +15,12 @@ abstract class RoomMessageDto extends Message {
 
   /// Default constructor
   factory RoomMessageDto({
-    required int createdAt,
     required String message,
     String? room,
     required User sender,
     required String receiver,
-  }) = _$MessageDtoImpl;
+    required int createdAt,
+  }) = _$RoomMessageDtoImpl;
 
   @override
   String get message;
@@ -38,7 +38,7 @@ abstract class RoomMessageDto extends Message {
 
   /// Creates an instance of [RoomMessageDto] from [json]
   factory RoomMessageDto.fromJson(Map<dynamic, dynamic> json) =
-      _$MessageDtoImpl.fromJson;
+      _$RoomMessageDtoImpl.fromJson;
 
   /// Converts [RoomMessageDto] to a [Map] json
   Map<String, dynamic> toJson();

@@ -6,7 +6,7 @@ from flask import current_app
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.cookies.get("authorization")
+        token = request.headers.get("Authorization")
         if not token:
             return {
                 "message": "Authentication Token is missing!",

@@ -6,13 +6,17 @@ import {
   ServerToClientTypes,
 } from 'src/types';
 import { RedisService } from 'src/user/redis.service';
-import { SocketWithUser } from '../types';
+import { UserService } from 'src/user/user.service';
+import { SocketWithUser } from './types';
 
 @Injectable()
 export class RoomClientService {
   static server: Server<any, ServerToClientTypes>;
 
-  constructor(private redis: RedisService) {}
+  constructor(
+    private redis: RedisService,
+    private userService: UserService,
+  ) {}
 
   sendMessage(br: BroadcastOperator<any, any>, message: IoRoomMessage) {
     const newMessage = { ...message, createdAt: Date.now() };
@@ -71,6 +75,9 @@ export class RoomClientService {
       messages: oldRoomMessages.reverse(),
     });
 
+    // Add the room to the user list
+    this.userService.addRoomToUser(client.user.id, room);
+
     return `${client.user.name} Joined ${room}`;
   }
 
@@ -93,6 +100,9 @@ export class RoomClientService {
     RoomClientService.server
       .to(room)
       .emit('roomEvents', { room, users: users });
+
+    // Add the room to the user list
+    this.userService.removeRoomFromUser(client.user.id, room);
 
     return `${client.user.name} Left ${room}`;
   }

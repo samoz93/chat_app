@@ -17,10 +17,17 @@ spec:
         - name: flask-api
           image: samoz93/flask-api
           ports:
-            - containerPort: 5000
+            - containerPort: 8000
           envFrom:
             - configMapRef:
                 name: chat-config
+          volumeMounts:
+            - name: flask-storage
+              mountPath: /rooms
+      volumes:
+        - name: flask-storage
+          persistentVolumeClaim:
+            claimName: flask-claim
 ---
 apiVersion: v1
 kind: Service
@@ -29,8 +36,8 @@ metadata:
   namespace: chat-app
 spec:
   ports:
-    - port: 5000
-      targetPort: 5000
+    - port: 8000
+      targetPort: 8000
       protocol: TCP
   selector:
     app: flask

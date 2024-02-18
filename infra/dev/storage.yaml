@@ -30,3 +30,20 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: "/data"
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: flask-storage
+  namespace: chat-app
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/flask/data"

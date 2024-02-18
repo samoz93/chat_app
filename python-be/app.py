@@ -5,7 +5,7 @@ from util.db_util import can_paint,init_db
 import threading
 import os.path
 from pathlib import Path
-
+import requests
 
 
 app = Flask(__name__,)
@@ -55,7 +55,7 @@ def hello_world(user_data):
 
     # If the user has not requested a painting, create a new job
     if can_paint(userId,room):
-        threading.Thread(target=paint, args=(prompt,save_path)).start()
+        threading.Thread(target=paint, args=(prompt,save_path,userId)).start()
         return jsonify({"status": "Painting in progress"}), 201
     else:
         return jsonify({"status":"Painting is on the way"}) if not os.path.isfile(save_path) else send_file(save_path,mimetype='image/png')
@@ -78,6 +78,10 @@ def get_room(user_data,room):
         return send_file(pth,mimetype='image/png')
     return jsonify({"error":"Room not found"}),404
 
+@app.route("/flask")
+def test():
+    return "Hello, World! From flask"
+
 if __name__ == "__main__":
     print("Running app.py")
-    app.run(port=8000, debug=True)
+    app.run(port=8000, debug=True, host='0.0.0.0')

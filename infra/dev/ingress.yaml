@@ -14,13 +14,6 @@ spec:
   rules:
     - http:
         paths:
-          - path: /flask
-            pathType: Prefix
-            backend:
-              service:
-                name: flask-service
-                port:
-                  number: 5000
           - path: /?(.*)
             pathType: Prefix
             backend:

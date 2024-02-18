@@ -17,7 +17,7 @@ import {
 } from 'src/types';
 import { RedisService } from 'src/user/redis.service';
 import { TokenService } from 'src/utils';
-import { RoomClientService } from './room.client/room.client.service';
+import { RoomClientService } from './room.client.service';
 import { SocketWithUser } from './types';
 
 @WebSocketGateway()
@@ -29,6 +29,8 @@ export class MessagesGateway
       const user = await this.tokenService.validateToken(
         socket.handshake.headers,
       );
+      console.log('user', user);
+
       socket['user'] = user; // socket['user'] = socket.user = user
       next();
     } catch (error) {
@@ -51,8 +53,6 @@ export class MessagesGateway
   }
 
   async handleConnection(@ConnectedSocket() client: SocketWithUser) {
-    console.log('connected');
-
     await this.redis.addUser(client.user, client.id);
     const unreadPrivateMessages = await this.redis.getUnreceivedMessages(
       client.user.id,
@@ -93,8 +93,6 @@ export class MessagesGateway
     if ('room' in message && message.room) {
       this.roomService.sendMessage(this.server.to(message.room), message);
     } else {
-      console.log('message', message);
-
       this.roomService.sendToUser(client, message);
     }
     return 'message sent';

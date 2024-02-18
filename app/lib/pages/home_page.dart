@@ -4,42 +4,11 @@ import 'package:app/helpers/carousel_item.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/services/socket.io.dart';
 import 'package:app/stores/auth_store.dart';
+import 'package:app/stores/main_store.dart';
 import 'package:app/utils/extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-
-final items = [
-  CarouselItem(
-      title: "SomeOther",
-      id: "room1",
-      image:
-          "https://cdn.pixabay.com/photo/2016/12/27/06/38/albert-einstein-1933340_1280.jpg",
-      isLiked: true),
-  CarouselItem(
-      title: "Hi",
-      id: "room2",
-      image:
-          "https://cdn.pixabay.com/photo/2016/12/27/06/38/albert-einstein-1933340_1280.jpg",
-      isLiked: true),
-  CarouselItem(
-      title: "Hi",
-      id: "room1",
-      image:
-          "https://cdn.pixabay.com/photo/2016/12/27/06/38/albert-einstein-1933340_1280.jpg",
-      isLiked: true),
-  CarouselItem(
-      title: "Hi",
-      id: "room1",
-      image:
-          "https://cdn.pixabay.com/photo/2016/12/27/06/38/albert-einstein-1933340_1280.jpg",
-      isLiked: true),
-  CarouselItem(
-      title: "Hi",
-      id: "room1",
-      image:
-          "https://cdn.pixabay.com/photo/2016/12/27/06/38/albert-einstein-1933340_1280.jpg",
-      isLiked: true),
-];
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -51,6 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _store = it.get<AuthStore>();
+  final _mainStore = it.get<MainStore>();
   final _io = it.get<SocketService>();
 
   Widget get _spacer => SizedBox(height: 15.sp);
@@ -58,6 +28,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _mainStore.init();
     _io.init();
   }
 
@@ -65,24 +36,46 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              getHeader(context),
-              _spacer,
-              getSearchBar(context),
-              _spacer,
-              SizedBox(
-                child: Carousel(
-                  items: items,
-                  title: "Favourite",
+        child: Observer(builder: (context) {
+          if (_mainStore.loading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (_mainStore.rooms.isEmpty) {
+            return const Center(
+              child: Text("No rooms found"),
+            );
+          }
+          final items = _mainStore.rooms
+              .map((e) => CarouselItem(
+                    title: e.name,
+                    subtitle: e.description,
+                    id: e.id,
+                    image: "https://picsum.photos/200/300?random=${e.id}",
+                    isLiked: true,
+                  ))
+              .toList();
+
+          return Padding(
+            padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                getHeader(context),
+                _spacer,
+                getSearchBar(context),
+                _spacer,
+                SizedBox(
+                  child: Carousel(
+                    items: items,
+                    title: "Favourite",
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
+              ],
+            ),
+          );
+        }),
       ),
     );
   }

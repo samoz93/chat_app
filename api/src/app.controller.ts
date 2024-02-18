@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { BehaviorSubject } from 'rxjs';
 import { AppService } from './app.service';
@@ -18,8 +18,39 @@ export class AppController {
   }
   subject = new BehaviorSubject('Hello World!');
 
+  @Get('test')
+  async getStream() {
+    const url = new URLSearchParams();
+    url.set('prompt', 'Draw a wonderful picture of a cat');
+    url.set('room', 'test');
+
+    const data = await fetch(`http://flask-service:8000/?${url.toString()}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOiIyMDI0LTAyLTA4VDE5OjE4OjE0Ljk0N1oiLCJ1cGRhdGVkQXQiOiIyMDI0LTAyLTA4VDE5OjE4OjE0Ljk0N1oiLCJpZCI6IjIyZmQyNmJkLTNjOGUtNGY5OS05NmU3LWNkNWE5ZWE0MGVjMyIsIm5hbWUiOiJ0ZXN0IiwiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNzA3Njc3MDU5LCJleHAiOjE3MDc3NjM0NTl9.ue-zKHZlBpWFyadoDIGrXy4mrY7tWZKhy6pI8iGTvm8',
+      },
+    });
+    return data.text();
+  }
+
+  @Post('image_done')
+  getMessage(@Req() request: Request) {
+    console.log(request.body);
+    return request.body;
+  }
+
   @Get()
   async getHello(@Res() response: Response, @Req() request: Request) {
+    // response.setHeader('Content-Type', 'text/event-stream');
+    // response.setHeader('Cache-Control', 'no-cache');
+    // response.setHeader('Connection', 'keep-alive');
+    // response.flushHeaders();
+    // response.write('data: ' + 'Hello World!' + '\n\n');
+    // this.subject.subscribe((data) => {
+    //   response.write('data: ' + data + '\n\n');
+    // });
     const abort = new AbortController();
     request.on('close', () => {
       console.log('close');

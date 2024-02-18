@@ -5,8 +5,8 @@
 
 part of 'message_dto.dart';
 
-class _$MessageDtoImpl extends RoomMessageDto {
-  _$MessageDtoImpl({
+class _$RoomMessageDtoImpl extends RoomMessageDto {
+  _$RoomMessageDtoImpl({
     required this.message,
     this.room,
     required this.sender,
@@ -29,8 +29,8 @@ class _$MessageDtoImpl extends RoomMessageDto {
   @override
   final int createdAt;
 
-  factory _$MessageDtoImpl.fromJson(Map<dynamic, dynamic> json) {
-    return _$MessageDtoImpl(
+  factory _$RoomMessageDtoImpl.fromJson(Map<dynamic, dynamic> json) {
+    return _$RoomMessageDtoImpl(
       message: json['message'] as String,
       room: json['room'] as String?,
       sender: User.fromJson(json['sender']),
@@ -76,10 +76,10 @@ class _$MessageDtoImpl extends RoomMessageDto {
 
   @override
   String toString() {
-    String toStringOutput = 'MessageDto{<optimized out>}';
+    String toStringOutput = 'RoomMessageDto{<optimized out>}';
     assert(() {
       toStringOutput =
-          'MessageDto@<$hexIdentity>{message: $message, room: $room, sender: $sender, receiver: $receiver, createdAt: $createdAt}';
+          'RoomMessageDto@<$hexIdentity>{message: $message, room: $room, sender: $sender, receiver: $receiver, createdAt: $createdAt}';
       return true;
     }());
     return toStringOutput;
@@ -89,7 +89,7 @@ class _$MessageDtoImpl extends RoomMessageDto {
   Type get runtimeType => RoomMessageDto;
 }
 
-abstract interface class _MessageDtoCopyWithProxy {
+abstract interface class _RoomMessageDtoCopyWithProxy {
   RoomMessageDto message(String newValue);
 
   RoomMessageDto room(String? newValue);
@@ -109,8 +109,8 @@ abstract interface class _MessageDtoCopyWithProxy {
   });
 }
 
-class _MessageDtoCopyWithProxyImpl implements _MessageDtoCopyWithProxy {
-  _MessageDtoCopyWithProxyImpl(this._value);
+class _RoomMessageDtoCopyWithProxyImpl implements _RoomMessageDtoCopyWithProxy {
+  _RoomMessageDtoCopyWithProxyImpl(this._value);
 
   final RoomMessageDto _value;
 
@@ -145,7 +145,7 @@ class _MessageDtoCopyWithProxyImpl implements _MessageDtoCopyWithProxy {
     final String? receiver,
     final int? createdAt,
   }) {
-    return _$MessageDtoImpl(
+    return _$RoomMessageDtoImpl(
       message: message ?? _value.message,
       room: identical(room, const Object()) ? _value.room : (room as String?),
       sender: sender ?? _value.sender,
@@ -155,10 +155,10 @@ class _MessageDtoCopyWithProxyImpl implements _MessageDtoCopyWithProxy {
   }
 }
 
-sealed class $MessageDtoCopyWithProxyChain<$Result> {
-  factory $MessageDtoCopyWithProxyChain(final RoomMessageDto value,
+sealed class $RoomMessageDtoCopyWithProxyChain<$Result> {
+  factory $RoomMessageDtoCopyWithProxyChain(final RoomMessageDto value,
           final $Result Function(RoomMessageDto update) chain) =
-      _MessageDtoCopyWithProxyChainImpl<$Result>;
+      _RoomMessageDtoCopyWithProxyChainImpl<$Result>;
 
   $Result message(String newValue);
 
@@ -179,9 +179,9 @@ sealed class $MessageDtoCopyWithProxyChain<$Result> {
   });
 }
 
-class _MessageDtoCopyWithProxyChainImpl<$Result>
-    implements $MessageDtoCopyWithProxyChain<$Result> {
-  _MessageDtoCopyWithProxyChainImpl(this._value, this._chain);
+class _RoomMessageDtoCopyWithProxyChainImpl<$Result>
+    implements $RoomMessageDtoCopyWithProxyChain<$Result> {
+  _RoomMessageDtoCopyWithProxyChainImpl(this._value, this._chain);
 
   final RoomMessageDto _value;
   final $Result Function(RoomMessageDto update) _chain;
@@ -215,7 +215,7 @@ class _MessageDtoCopyWithProxyChainImpl<$Result>
     final String? receiver,
     final int? createdAt,
   }) {
-    return _chain(_$MessageDtoImpl(
+    return _chain(_$RoomMessageDtoImpl(
       message: message ?? _value.message,
       room: identical(room, const Object()) ? _value.room : (room as String?),
       sender: sender ?? _value.sender,
@@ -225,6 +225,7 @@ class _MessageDtoCopyWithProxyChainImpl<$Result>
   }
 }
 
-extension $MessageDtoExtension on RoomMessageDto {
-  _MessageDtoCopyWithProxy get copyWith => _MessageDtoCopyWithProxyImpl(this);
+extension $RoomMessageDtoExtension on RoomMessageDto {
+  _RoomMessageDtoCopyWithProxy get copyWith =>
+      _RoomMessageDtoCopyWithProxyImpl(this);
 }

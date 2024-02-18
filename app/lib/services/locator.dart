@@ -1,8 +1,10 @@
 import 'package:app/repos/auth_repo.dart';
+import 'package:app/repos/rooms_repo.dart';
 import 'package:app/services/graph_client.dart';
 import 'package:app/services/local_storage.dart';
 import 'package:app/services/socket.io.dart';
 import 'package:app/stores/auth_store.dart';
+import 'package:app/stores/main_store.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -42,6 +44,14 @@ Future<void> setup() async {
     () => AuthStore(),
     dependsOn: [AuthRepo],
   );
+
+  it.registerSingletonWithDependencies(() {
+    return RoomsRepo();
+  }, dependsOn: [LocalStorage]);
+
+  it.registerSingletonWithDependencies(() {
+    return MainStore();
+  }, dependsOn: [LocalStorage]);
 
   await it.allReady();
 }

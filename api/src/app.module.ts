@@ -8,7 +8,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CONFIG } from './config';
 import { MessagesModule } from './messages/messages.module';
-import { RoomClientService } from './messages/room.client/room.client.service';
+import { RoomClientService } from './messages/room.client.service';
 import { RoomsModule } from './rooms/rooms.module';
 import { SharedModule } from './shared/shared.module';
 import { UserModule } from './user/user.module';

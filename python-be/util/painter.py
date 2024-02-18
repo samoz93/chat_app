@@ -1,6 +1,7 @@
 from diffusers import StableDiffusionPipeline
+import requests
 
-def paint(prompt,save_path, target_resolution=(512, 512)):
+def paint(prompt,save_path,user_id, target_resolution=(512, 512)):
     print("Painting...")
     
     # Initialize the StableDiffusionPipeline
@@ -16,6 +17,7 @@ def paint(prompt,save_path, target_resolution=(512, 512)):
 
     # Save the resized image with the specified filename
     resized_image.save(save_path)
+    requests.post("http://chat-api-service:3000/image_done",json={"room":save_path,"prompt":prompt,"status":"done","user_id":user_id})
 
 if __name__ == "__main__":
     # Example usage:

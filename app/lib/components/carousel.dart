@@ -1,5 +1,4 @@
 import 'package:app/helpers/carousel_item.dart';
-import 'package:app/pages/home_page.dart';
 import 'package:app/pages/room_chat.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/services/socket.io.dart';
@@ -108,10 +107,10 @@ class _CarouselState extends State<Carousel> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: widget.items.map((e) {
-            final isSelected = items.indexOf(e) == page;
+            final isSelected = widget.items.indexOf(e) == page;
             return GestureDetector(
               onTap: () => _ctrl.animateToPage(
-                items.indexOf(e),
+                widget.items.indexOf(e),
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeIn,
               ),
