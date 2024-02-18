@@ -65,8 +65,8 @@ class UserListTile extends StatelessWidget {
             const SizedBox(width: 10),
             Flexible(
               child: Observer(builder: (context) {
-                final lastMessage = _store.messages.last.message;
-                final lastMessageTime = _store.messages.last.createdAt;
+                final lastMessage = _store.messages.lastOrNull?.message;
+                final lastMessageTime = _store.messages.lastOrNull?.createdAt;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -81,7 +81,7 @@ class UserListTile extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          lastMessageTime.toFormattedString(),
+                          lastMessageTime?.toFormattedString() ?? "",
                           style: const TextStyle(
                             fontSize: 16,
                             color: Colors.white,
@@ -91,7 +91,7 @@ class UserListTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 5),
                     Text(
-                      lastMessage,
+                      lastMessage ?? "",
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.grey,

@@ -6,7 +6,6 @@ import 'package:app/services/local_storage.dart';
 import 'package:app/services/socket.io.dart';
 import 'package:app/stores/auth_store.dart';
 import 'package:app/stores/friends_manager.dart';
-import 'package:app/stores/main_store.dart';
 import 'package:app/stores/rooms_manager.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -33,7 +32,6 @@ Future<void> setup() async {
   it.registerSingleton<FriendsManager>(FriendsManager());
   it.registerSingleton<RoomsManager>(RoomsManager());
   it.registerSingleton(AuthStore());
-  it.registerSingleton(MainStore());
 
   await it.allReady();
 }

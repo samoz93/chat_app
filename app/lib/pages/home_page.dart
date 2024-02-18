@@ -7,7 +7,7 @@ import 'package:app/services/locator.dart';
 import 'package:app/services/socket.io.dart';
 import 'package:app/stores/auth_store.dart';
 import 'package:app/stores/friends_manager.dart';
-import 'package:app/stores/main_store.dart';
+import 'package:app/stores/rooms_manager.dart';
 import 'package:app/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -24,15 +24,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final _store = it.get<AuthStore>();
   final _repo = it.get<AuthRepo>();
-  final _mainStore = it.get<MainStore>();
   final _io = it.get<SocketService>();
+  final _roomManager = it.get<RoomsManager>();
   final _friendsManager = it.get<FriendsManager>();
 
   Widget get _spacer => SizedBox(height: 15.sp);
   @override
   void initState() {
     super.initState();
-    _mainStore.init();
     _io.init();
   }
 
@@ -41,17 +40,17 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: SafeArea(
         child: Observer(builder: (context) {
-          if (_mainStore.loading) {
+          if (_roomManager.loading) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
-          if (_mainStore.rooms.isEmpty) {
+          if (_roomManager.rooms.isEmpty) {
             return const Center(
               child: Text("No rooms found"),
             );
           }
-          final items = _mainStore.rooms
+          final items = _roomManager.rooms
               .map((e) => CarouselItem(
                     title: e.name,
                     subtitle: e.description,
@@ -81,6 +80,16 @@ class _HomePageState extends State<HomePage> {
                   flex: 1,
                   child: Observer(
                     builder: (context) {
+                      if (_friendsManager.loading) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if (_friendsManager.friends.isEmpty) {
+                        return const Center(
+                          child: Text("No friends found"),
+                        );
+                      }
                       return ListView.builder(
                         itemCount: _friendsManager.friends.length,
                         itemBuilder: (ctx, idx) {

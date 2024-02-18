@@ -11,7 +11,7 @@ import 'package:graphql/client.dart';
 class ChatRepo {
   final _graphClient = it.get<GraphClient>();
 
-  FutureOr<List<RoomDto>> getRooms() async {
+  Future<List<RoomDto>> getRooms() async {
     final options = QueryOptions(document: gql(getRoomsQuery));
     final result = await _graphClient.client.query(options);
     if (result.hasException) {
