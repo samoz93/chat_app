@@ -1,6 +1,6 @@
 import 'package:app/components/carousel.dart';
 import 'package:app/components/custom_input.dart';
-import 'package:app/components/private_chat_tile.dart';
+import 'package:app/components/user_list_tile.dart';
 import 'package:app/helpers/carousel_item.dart';
 import 'package:app/repos/auth_repo.dart';
 import 'package:app/services/locator.dart';
@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
                         itemCount: _friendsManager.friends.length,
                         itemBuilder: (ctx, idx) {
                           final friend = _friendsManager.friends.elementAt(idx);
-                          return PrivateChatTile(
+                          return UserListTile(
                             user: friend,
                             unreadCount: 1,
                           );

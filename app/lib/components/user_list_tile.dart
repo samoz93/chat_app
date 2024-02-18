@@ -9,10 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-class PrivateChatTile extends StatelessWidget {
+class UserListTile extends StatelessWidget {
   final User user;
   final int unreadCount;
-  const PrivateChatTile({
+  const UserListTile({
     super.key,
     required this.user,
     required this.unreadCount,
@@ -38,20 +38,28 @@ class PrivateChatTile extends StatelessWidget {
               clipBehavior: Clip.none,
               children: [
                 UsersAvatar(user: user),
-                Positioned(
-                  top: -10.sp,
-                  left: -15.sp,
-                  child: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                    child: Text(
-                      "+$unreadCount",
-                      style:
-                          Theme.of(context).textTheme.headlineSmall!.copyWith(
-                                color: Colors.white,
-                              ),
-                    ),
-                  ),
-                )
+                Observer(
+                  builder: (context) {
+                    return _store.unreadCount > 0
+                        ? Positioned(
+                            top: -10.sp,
+                            left: -15.sp,
+                            child: CircleAvatar(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.secondary,
+                                child: Text(
+                                  "+${_store.unreadCount}",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                        color: Colors.white,
+                                      ),
+                                )),
+                          )
+                        : const SizedBox();
+                  },
+                ),
               ],
             ),
             const SizedBox(width: 10),

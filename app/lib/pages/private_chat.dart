@@ -29,6 +29,8 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
   @override
   void initState() {
     _store = it.get<FriendsManager>().stores[widget.peerId]!;
+    _store.clearUnread();
+    _store.isActive = true;
 
     Future.delayed(500.ms, () {
       _scrlCtrl.jumpTo(
@@ -64,6 +66,8 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
   void dispose() {
     _scrlCtrl.removeListener(scrollListener);
     dis();
+    _store.isActive = false;
+
     super.dispose();
   }
 

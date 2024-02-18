@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app/models/private_messsage_dto.dart';
 import 'package:app/models/sealed_classes.dart';
 import 'package:app/models/user_dto.dart';
 import 'package:app/services/local_storage.dart';
@@ -36,12 +37,26 @@ abstract class BaseChatBase<T extends Message> with Store {
   @protected
   final me = it.get<LocalStorage>().me!;
 
+// Don't keep track of unread messages if we are in the chat
+  bool _isActiveInChat = false;
+
+  set isActive(bool value) {
+    _isActiveInChat = value;
+  }
+
+  bool get isActive => _isActiveInChat;
+
   BaseChatBase() {
     final dis2 = io.newMessageStream
         .where((event) => event is T && filter(event))
         .listen((message) {
       appendMessage(message as T);
-      unreadCount += 1;
+      // Add unread messages for messages that are not originated from me
+      if (message is PrivateMessageDto &&
+          message.sender.id != me.id &&
+          !isActive) {
+        unreadCount++;
+      }
     });
 
     disposers.add(dis2);
