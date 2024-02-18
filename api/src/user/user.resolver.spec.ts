@@ -1,12 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { TokenService, UserService } from 'src/services';
 import { MockUsers } from 'src/test_utils/constants';
 import {
   TokenServiceMockFactory,
   UserServiceMockFactory,
 } from 'src/test_utils/userService.mock';
-import { TokenService } from 'src/utils';
 import { UserResolver } from './user.resolver';
-import { UserService } from './user.service';
 
 describe('UserResolver', () => {
   let resolver: UserResolver;

@@ -2,11 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as _ from 'lodash';
 import { UserEntity } from 'src/entities/user.entity';
+import { TokenService, UserService } from 'src/services';
 import { MockUsers } from 'src/test_utils/constants';
 import { TokenServiceMockFactory } from 'src/test_utils/userService.mock';
-import { TokenService } from 'src/utils';
 import { Repository } from 'typeorm';
-import { UserService } from './user.service';
 
 describe('UserService', () => {
   let service: UserService;

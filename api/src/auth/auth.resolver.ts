@@ -1,15 +1,18 @@
-import { HttpException, UseFilters } from '@nestjs/common';
+import {
+  HttpException,
+  UnauthorizedException,
+  UseFilters,
+} from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Response } from 'express';
 import { HttpExceptionFilter } from 'src/http-exception-filter/http-exception-filter.filter';
 import { AuthPayload, NewUserInput } from 'src/schema/graphql';
-import { TokenService } from 'src/shared/token.service';
+import { TokenService, UserService } from 'src/services';
 import { JWT_TOKEN, REFRESH_TOKEN } from 'src/types';
-import { UserService } from 'src/user/user.service';
-import { GraphResponse } from 'src/utils';
+import { GraphResponse, sanitizeUser } from 'src/utils';
 import { AuthService } from './auth.service';
 @Resolver('Auth')
-@UseFilters(new HttpExceptionFilter())
+@UseFilters(HttpExceptionFilter)
 export class AuthResolver {
   constructor(
     private authService: AuthService,
@@ -25,22 +28,11 @@ export class AuthResolver {
   ): Promise<AuthPayload> {
     const authPayload = await this.authService.validateUser(email, password);
 
-    if (!authPayload) {
-      throw new HttpException(
-        'Invalid credentials, User not found or password is incorrect',
-        401,
-      );
-    }
     res.cookie(REFRESH_TOKEN, authPayload.refreshToken);
     res.cookie(JWT_TOKEN, authPayload.token);
 
-    const fullUser = await this.userService.getUserWithRelations(
-      authPayload.user.id,
-    );
-
     return {
       ...authPayload,
-      user: fullUser,
     };
   }
 
@@ -50,11 +42,13 @@ export class AuthResolver {
     @GraphResponse() res: Response,
   ): Promise<AuthPayload> {
     const userExists = await this.userService.userExists(data.email);
+
+    // TODO: create a new error for this ? auth error maybe ?
     if (userExists) {
-      throw new HttpException('User already exists', 409);
+      throw new UnauthorizedException('User already exists');
     }
 
-    const user = await this.userService.createUser(data);
+    const user = await this.userService.createUser(data).then(sanitizeUser);
     const jwt = this.tokenService.createToken(user);
 
     res.cookie(REFRESH_TOKEN, jwt.refreshToken);
@@ -76,7 +70,8 @@ export class AuthResolver {
     }
 
     const { id } = await this.tokenService.validateRefreshToken(refreshToken);
-    const user = await this.userService.getUserById(id);
+    const user = await this.userService.getUserById(id).then(sanitizeUser);
+
     const jwt = this.tokenService.createToken(user);
 
     res.cookie(REFRESH_TOKEN, jwt.refreshToken);
@@ -86,10 +81,5 @@ export class AuthResolver {
       user,
       ...jwt,
     };
-  }
-
-  @Query('test')
-  async test(): Promise<any> {
-    return this.userService.getAllUsers();
   }
 }

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { BroadcastOperator, Server } from 'socket.io';
+import { UserService } from 'src/services';
 import {
   IoPrivateMessage,
   IoRoomMessage,
   ServerToClientTypes,
 } from 'src/types';
 import { RedisService } from 'src/user/redis.service';
-import { UserService } from 'src/user/user.service';
 import { SocketWithUser } from './types';
 
 @Injectable()

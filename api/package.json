@@ -36,6 +36,7 @@
     "@types/passport-local": "^1.0.38",
     "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.3",
+    "await-to-js": "^3.0.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "graphql": "^16.8.1",

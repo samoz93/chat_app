@@ -6,8 +6,6 @@ import { TokenService } from 'src/utils';
 import { GQAuthGuard } from './auth.guard';
 
 describe('AuthGuard', () => {
-  let auth: GQAuthGuard;
-
   describe('RolesGuard', () => {
     let guard: GQAuthGuard;
     let reflector: Reflector;

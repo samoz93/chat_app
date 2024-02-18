@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { TokenService } from 'src/shared/token.service';
+import { TokenService } from 'src/services';
 import { IS_PUBLIC_KEY } from './meta';
 
 @Injectable()

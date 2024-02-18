@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { TokenService } from './token.service';
+import { TokenService } from 'src/services';
 
 @Injectable()
 export class MessagesGuard implements CanActivate {

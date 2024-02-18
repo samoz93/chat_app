@@ -10,14 +10,13 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { TokenService } from 'src/shared/token.service';
+import { TokenService, UserService } from 'src/services';
 import {
   IoPrivateMessage,
   IoRoomMessage,
   ServerToClientTypes,
 } from 'src/types';
 import { RedisService } from 'src/user/redis.service';
-import { UserService } from 'src/user/user.service';
 import { RoomClientService } from './room.client.service';
 import { SocketWithUser } from './types';
 
