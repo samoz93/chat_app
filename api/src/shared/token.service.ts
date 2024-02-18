@@ -16,7 +16,6 @@ export class TokenService {
   private jwtRefreshService = new JwtService({
     secret: CONFIG.jwtSecret,
     global: true,
-    verifyOptions: { algorithms: ['ES256'] },
     signOptions: { expiresIn: '7d' },
   });
 
@@ -42,6 +41,7 @@ export class TokenService {
       const data = await this.jwtRefreshService.verifyAsync<{ id: string }>(
         tokenString,
       );
+
       if (!data) {
         throw new UnauthorizedException('Invalid token');
       }

@@ -2,6 +2,7 @@ import 'package:app/helpers/carousel_item.dart';
 import 'package:app/pages/room_chat.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/services/socket.io.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
@@ -65,39 +66,41 @@ class _CarouselState extends State<Carousel> {
                   Navigator.of(context)
                       .pushNamed(RoomChatPage.route, arguments: item.id)
                 },
-                child: Container(
-                  padding: EdgeInsets.all(15.sp),
-                  margin: EdgeInsets.only(right: 15.sp),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color.fromARGB(25, 0, 0, 0),
-                        Color.fromARGB(255, 0, 0, 0),
-                      ],
-                      stops: [
-                        0.5,
-                        1.0,
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      tileMode: TileMode.decal,
-                    ),
-                    borderRadius: BorderRadius.circular(
-                      20,
-                    ),
-                    image: DecorationImage(
-                      image: NetworkImage(
-                        item.image,
-                      ),
-                      fit: BoxFit.cover,
-                      opacity: .6,
-                    ),
-                  ),
-                  child: Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Text(item.title),
-                  ),
-                ),
+                child: CachedNetworkImage(
+                    imageUrl: item.image,
+                    imageBuilder: (context, imgProvider) {
+                      return Container(
+                        padding: EdgeInsets.all(15.sp),
+                        margin: EdgeInsets.only(right: 15.sp),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color.fromARGB(25, 0, 0, 0),
+                              Color.fromARGB(255, 0, 0, 0),
+                            ],
+                            stops: [
+                              0.5,
+                              1.0,
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            tileMode: TileMode.decal,
+                          ),
+                          borderRadius: BorderRadius.circular(
+                            20,
+                          ),
+                          image: DecorationImage(
+                            image: imgProvider,
+                            fit: BoxFit.cover,
+                            opacity: .6,
+                          ),
+                        ),
+                        child: Align(
+                          alignment: Alignment.bottomLeft,
+                          child: Text(item.title),
+                        ),
+                      );
+                    }),
               );
             },
             itemCount: widget.items.length,

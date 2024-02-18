@@ -13,9 +13,18 @@ abstract class RoomsManagerBase extends BaseLoadableStore with Store {
 
   @action
   initState() async {
-    rooms = await super.getData(_roomRepo.getRooms()) ?? [];
+    _rooms = await super.getData(_roomRepo.getRooms()) ?? [];
   }
 
   @observable
-  List<RoomDto> rooms = [];
+  List<RoomDto> _rooms = [];
+
+  @computed
+  List<RoomDto> get rooms {
+    if (search.isEmpty) {
+      return _rooms;
+    }
+
+    return _rooms.where((element) => element.name.contains(search)).toList();
+  }
 }

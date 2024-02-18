@@ -41,8 +41,57 @@ mixin _$BaseLoadableStore on BaseLoadableStoreBase, Store {
     });
   }
 
+  late final _$searchAtom =
+      Atom(name: 'BaseLoadableStoreBase.search', context: context);
+
+  @override
+  String get search {
+    _$searchAtom.reportRead();
+    return super.search;
+  }
+
+  @override
+  set search(String value) {
+    _$searchAtom.reportWrite(value, super.search, () {
+      super.search = value;
+    });
+  }
+
   late final _$BaseLoadableStoreBaseActionController =
       ActionController(name: 'BaseLoadableStoreBase', context: context);
+
+  @override
+  void setSearch(String value) {
+    final _$actionInfo = _$BaseLoadableStoreBaseActionController.startAction(
+        name: 'BaseLoadableStoreBase.setSearch');
+    try {
+      return super.setSearch(value);
+    } finally {
+      _$BaseLoadableStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void clearError() {
+    final _$actionInfo = _$BaseLoadableStoreBaseActionController.startAction(
+        name: 'BaseLoadableStoreBase.clearError');
+    try {
+      return super.clearError();
+    } finally {
+      _$BaseLoadableStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  dynamic clearSearch() {
+    final _$actionInfo = _$BaseLoadableStoreBaseActionController.startAction(
+        name: 'BaseLoadableStoreBase.clearSearch');
+    try {
+      return super.clearSearch();
+    } finally {
+      _$BaseLoadableStoreBaseActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void setLoading(bool value) {
@@ -70,7 +119,8 @@ mixin _$BaseLoadableStore on BaseLoadableStoreBase, Store {
   String toString() {
     return '''
 loading: ${loading},
-error: ${error}
+error: ${error},
+search: ${search}
     ''';
   }
 }

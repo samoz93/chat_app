@@ -39,74 +39,72 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Observer(builder: (context) {
-          if (_roomManager.loading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (_roomManager.rooms.isEmpty) {
-            return const Center(
-              child: Text("No rooms found"),
-            );
-          }
-          final items = _roomManager.rooms
-              .map((e) => CarouselItem(
-                    title: e.name,
-                    subtitle: e.description,
-                    id: e.id,
-                    image: "https://picsum.photos/200/300?random=${e.id}",
-                    isLiked: true,
-                  ))
-              .toList();
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              getHeader(context),
+              _spacer,
+              getSearchBar(context),
+              _spacer,
+              Observer(builder: (context) {
+                if (_roomManager.loading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                if (_roomManager.rooms.isEmpty) {
+                  return const SizedBox();
+                }
+                final items = _roomManager.rooms
+                    .map((e) => CarouselItem(
+                          title: e.name,
+                          subtitle: e.description,
+                          id: e.id,
+                          image: "https://picsum.photos/200/300?random=${e.id}",
+                          isLiked: true,
+                        ))
+                    .toList();
 
-          return Padding(
-            padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                getHeader(context),
-                _spacer,
-                getSearchBar(context),
-                _spacer,
-                SizedBox(
+                return SizedBox(
                   child: Carousel(
                     items: items,
                     title: "Rooms",
                   ),
-                ),
-                _spacer,
-                Flexible(
-                  flex: 1,
-                  child: Observer(
-                    builder: (context) {
-                      if (_friendsManager.loading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
-                      if (_friendsManager.friends.isEmpty) {
-                        return const Center(
-                          child: Text("No friends found"),
-                        );
-                      }
-                      return ListView.builder(
-                        itemCount: _friendsManager.friends.length,
-                        itemBuilder: (ctx, idx) {
-                          final friend = _friendsManager.friends.elementAt(idx);
-                          return UserListTile(
-                            user: friend,
-                            unreadCount: 1,
-                          );
-                        },
+                );
+              }),
+              _spacer,
+              Flexible(
+                flex: 1,
+                child: Observer(
+                  builder: (context) {
+                    if (_friendsManager.loading) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
                       );
-                    },
-                  ),
+                    }
+                    if (_friendsManager.friends.isEmpty) {
+                      return const Center(
+                        child: Text("No friends found"),
+                      );
+                    }
+                    return ListView.builder(
+                      itemCount: _friendsManager.friends.length,
+                      itemBuilder: (ctx, idx) {
+                        final friend = _friendsManager.friends.elementAt(idx);
+                        return UserListTile(
+                          user: friend,
+                          unreadCount: 1,
+                        );
+                      },
+                    );
+                  },
                 ),
-              ],
-            ),
-          );
-        }),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -120,7 +118,10 @@ class _HomePageState extends State<HomePage> {
           flex: 4,
           child: CustomInput(
             label: "Search",
-            onChanged: (v) {},
+            onChanged: (v) {
+              _roomManager.setSearch(v);
+              _friendsManager.setSearch(v);
+            },
             suffixIcon: Icons.search,
           ),
         ),

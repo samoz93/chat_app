@@ -14,6 +14,24 @@ abstract class BaseLoadableStoreBase with Store {
   @observable
   dynamic error;
 
+  @observable
+  String search = '';
+
+  @action
+  void setSearch(String value) {
+    search = value;
+  }
+
+  @action
+  void clearError() {
+    error = null;
+  }
+
+  @action
+  clearSearch() {
+    search = '';
+  }
+
   @action
   void setLoading(bool value) {
     loading = value;

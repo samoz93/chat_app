@@ -74,6 +74,7 @@ export class AuthResolver {
     if (!refreshToken) {
       throw new HttpException('Invalid refresh token', 401);
     }
+
     const { id } = await this.tokenService.validateRefreshToken(refreshToken);
     const user = await this.userService.getUserById(id);
     const jwt = this.tokenService.createToken(user);
