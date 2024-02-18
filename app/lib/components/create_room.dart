@@ -51,7 +51,7 @@ class CreateRoomDialog extends StatelessWidget {
                   }
                   return null;
                 },
-                isTextArea: true,
+                isExpanded: true,
               ),
               SizedBox(height: 20.sp),
               Observer(builder: (context) {

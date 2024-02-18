@@ -17,20 +17,22 @@ class CustomInput extends StatefulWidget {
   final IconData? suffixIcon;
   final IconData? prefixIcon;
   final FocusNode? focusNode;
-  final bool isTextArea;
+  final bool isExpanded;
+
+  /// Shorthand constructor
   CustomInput({
     super.key,
-    this.label,
     this.initalValue = "",
+    this.label,
     this.validator,
-    this.controller,
     required this.onChanged,
+    this.onSuffixClicked,
+    this.onPrefixClicked,
     this.suffixIcon,
     this.prefixIcon,
     this.focusNode,
-    this.onSuffixClicked,
-    this.onPrefixClicked,
-    this.isTextArea = false,
+    this.isExpanded = false,
+    this.controller,
   });
 
   @override
@@ -81,8 +83,11 @@ class _CustomInputState extends State<CustomInput> {
         onChanged: _onChanged,
         validator: widget.validator,
         controller: _controller,
-        maxLines: null,
+        maxLines: widget.isExpanded ? null : 1,
         focusNode: _focus,
+        onEditingComplete: () {
+          _focus.nextFocus();
+        },
         style: Theme.of(context).textTheme.bodyMedium,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         decoration: InputDecoration(
