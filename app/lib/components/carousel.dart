@@ -1,7 +1,5 @@
 import 'package:app/helpers/carousel_item.dart';
 import 'package:app/pages/room_chat.dart';
-import 'package:app/services/locator.dart';
-import 'package:app/services/socket.io.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -22,8 +20,7 @@ class Carousel extends StatefulWidget {
 class _CarouselState extends State<Carousel> {
   var page = 0;
   final _ctrl =
-      PageController(viewportFraction: 0.3, initialPage: 0, keepPage: true);
-  final _client = it.get<SocketService>();
+      PageController(viewportFraction: 0.4, initialPage: 0, keepPage: true);
 
   @override
   void initState() {
@@ -53,8 +50,7 @@ class _CarouselState extends State<Carousel> {
           widget.title,
           style: Theme.of(context).textTheme.headlineMedium,
         ),
-        SizedBox(
-          height: 50.sp,
+        Expanded(
           child: PageView.builder(
             scrollDirection: Axis.horizontal,
             controller: _ctrl,

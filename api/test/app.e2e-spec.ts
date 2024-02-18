@@ -54,6 +54,7 @@ describe('GraphQl, Testing User functionalities', () => {
     const repo = app.get(getRepositoryToken(UserEntity));
     await repo.delete({});
   });
+
   afterAll(async () => {
     await app.close();
   });

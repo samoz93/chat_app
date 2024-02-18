@@ -169,10 +169,13 @@ class IconBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onClick,
-      child: Icon(
-        icon,
-        color: color,
-      ),
+      child: LayoutBuilder(builder: (context, ctx) {
+        return Icon(
+          icon,
+          color: color,
+          size: ctx.maxHeight * 0.35,
+        );
+      }),
     );
   }
 }
