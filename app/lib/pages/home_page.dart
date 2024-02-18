@@ -76,6 +76,7 @@ class _HomePageState extends State<HomePage> {
                     title: "Rooms",
                   ),
                 ),
+                _spacer,
                 Flexible(
                   flex: 1,
                   child: Observer(
