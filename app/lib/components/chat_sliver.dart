@@ -79,8 +79,10 @@ class _ChatSliverState<T extends BaseChat> extends State<ChatSliver<T>> {
           Padding(
             padding: EdgeInsets.all(10.sp),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
+                  flex: 5,
                   child: CustomInput(
                     onChanged: (value) {},
                     label: "Type a message",
@@ -97,17 +99,20 @@ class _ChatSliverState<T extends BaseChat> extends State<ChatSliver<T>> {
                     },
                   ),
                 ),
-                IconBox(
-                  onClick: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Camera not implemented"),
-                      ),
-                    );
-                  },
-                  icon: Icons.camera,
-                  type: IconType.suffix,
-                  color: Theme.of(context).colorScheme.tertiary,
+                Expanded(
+                  flex: 1,
+                  child: IconBox(
+                    onClick: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Camera not implemented"),
+                        ),
+                      );
+                    },
+                    icon: Icons.camera,
+                    type: IconType.suffix,
+                    color: Theme.of(context).colorScheme.tertiary,
+                  ),
                 ),
               ],
             ),

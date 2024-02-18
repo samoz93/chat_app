@@ -131,14 +131,6 @@ class _HomePageState extends State<HomePage> {
         Flexible(
           flex: 1,
           child: TextButton(
-            style: Theme.of(context).elevatedButtonTheme.style!.copyWith(
-                  backgroundColor: MaterialStateProperty.all(
-                    Theme.of(context).colorScheme.tertiary,
-                  ),
-                  minimumSize: MaterialStateProperty.all(
-                    Size(0, 31.sp),
-                  ),
-                ),
             onPressed: () async {
               final data = await showDialog<RoomDto>(
                 context: context,
