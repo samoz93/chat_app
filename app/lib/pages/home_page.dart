@@ -27,10 +27,10 @@ class _HomePageState extends State<HomePage> {
   final _mainStore = it.get<MainStore>();
   final _io = it.get<SocketService>();
   final _friendsManager = it.get<FriendsManager>();
+
   Widget get _spacer => SizedBox(height: 15.sp);
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _mainStore.init();
     _io.init();
