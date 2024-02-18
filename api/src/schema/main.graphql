@@ -4,7 +4,8 @@ type User {
   id: ID!
   name: String!
   email: String!
-  rooms: [ChatRoom]
+  rooms: [ChatRoom!]
+  ownerRooms: [ChatRoom!]
   createdAt: Date
   updatedAt: Date
   friends: [User]

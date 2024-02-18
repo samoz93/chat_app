@@ -11,18 +11,21 @@ export class RoomsService {
   ) {}
 
   async createRoom(name: string, description: string, owner: UserEntity) {
-    return await this.repo.save({
+    const room = await this.repo.save({
       name,
       description,
       owner: owner,
       users: [owner],
     });
+    await this.repo.save(room);
+    return room;
   }
 
   async getRooms(page: number = 0, limit: number = 10) {
     return await this.repo.find({
       take: limit,
       skip: page * limit,
+      order: { createdAt: 'DESC' },
     });
   }
 }

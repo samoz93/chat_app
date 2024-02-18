@@ -67,3 +67,13 @@ const friendsQuery = r'''
       }
   }
 ''';
+
+const createRoomMutation = r'''
+mutation CreateRoom($name: String!, $description: String!) {
+    createRoom(name: $name, description: $description) {
+        id
+        name
+        description
+    }
+}
+''';

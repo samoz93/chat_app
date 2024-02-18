@@ -1,7 +1,10 @@
 import 'package:app/components/carousel.dart';
+import 'package:app/components/create_room.dart';
 import 'package:app/components/custom_input.dart';
 import 'package:app/components/user_list_tile.dart';
 import 'package:app/helpers/carousel_item.dart';
+import 'package:app/models/room_dto.dart';
+import 'package:app/pages/auth_page.dart';
 import 'package:app/repos/auth_repo.dart';
 import 'package:app/services/locator.dart';
 import 'package:app/services/socket.io.dart';
@@ -136,8 +139,13 @@ class _HomePageState extends State<HomePage> {
                     Size(0, 31.sp),
                   ),
                 ),
-            onPressed: () {
-              _repo.refreshToken();
+            onPressed: () async {
+              final data = await showDialog<RoomDto>(
+                context: context,
+                builder: (ctx) => CreateRoomDialog(),
+              );
+              if (data == null) return;
+              _roomManager.createRoom(data);
             },
             child: const Icon(Icons.add),
           ),
@@ -146,19 +154,34 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Wrap getHeader(BuildContext context) {
-    return Wrap(
-      direction: Axis.horizontal,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 15.sp,
+  Widget getHeader(BuildContext context) {
+    return Row(
       children: [
         const CircleAvatar(
           radius: 20,
           child: FlutterLogo(),
         ),
+        SizedBox(width: 15.sp), // const Spacer(
         Text(
           (_store.me?.name ?? "").capitalize(),
           style: Theme.of(context).textTheme.headlineLarge,
+        ),
+        const Flexible(
+          fit: FlexFit.tight,
+          child: SizedBox(),
+        ),
+        TextButton(
+          onPressed: () {
+            _repo.logout();
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              AuthPage.route,
+              (route) => false,
+            );
+          },
+          child: const Text(
+            "Logout",
+            textAlign: TextAlign.end,
+          ),
         ),
       ],
     );

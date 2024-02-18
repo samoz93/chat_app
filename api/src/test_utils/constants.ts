@@ -8,5 +8,6 @@ export const MockUsers: UserEntity[] = [
     password: 'test',
     updatedAt: new Date(),
     createdAt: new Date(),
+    ownedRooms: [],
   },
 ];

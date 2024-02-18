@@ -81,9 +81,7 @@ class AuthRepo {
     final result = await _graphClient.client.query(options);
 
     if (result.hasException) {
-      // TODO: handle refresh token error
-      // throw ChatException(exception: result.exception!);
-      return;
+      throw ChatException(exception: result.exception!);
     }
 
     final data = result.data!['Refresh'] != null

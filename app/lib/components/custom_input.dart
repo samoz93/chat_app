@@ -17,6 +17,7 @@ class CustomInput extends StatefulWidget {
   final IconData? suffixIcon;
   final IconData? prefixIcon;
   final FocusNode? focusNode;
+  final bool isTextArea;
   CustomInput({
     super.key,
     this.label,
@@ -29,6 +30,7 @@ class CustomInput extends StatefulWidget {
     this.focusNode,
     this.onSuffixClicked,
     this.onPrefixClicked,
+    this.isTextArea = false,
   });
 
   @override
@@ -79,6 +81,7 @@ class _CustomInputState extends State<CustomInput> {
         onChanged: _onChanged,
         validator: widget.validator,
         controller: _controller,
+        maxLines: null,
         focusNode: _focus,
         style: Theme.of(context).textTheme.bodyMedium,
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -161,27 +164,9 @@ class IconBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onClick,
-      child: Container(
-        padding: EdgeInsets.all(
-          4.2.w,
-        ),
-        margin: EdgeInsets.only(
-          right: type == IconType.prefix ? 10.sp : 0,
-          left: type == IconType.suffix ? 10.sp : 0,
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15.sp),
-          color: Theme.of(context).colorScheme.secondary,
-          border: BorderDirectional(
-            bottom: BorderSide(
-              color: colorUnder,
-            ),
-          ),
-        ),
-        child: Icon(
-          icon,
-          color: color,
-        ),
+      child: Icon(
+        icon,
+        color: color,
       ),
     );
   }

@@ -8,7 +8,9 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 class UsersAvatar extends StatelessWidget {
   final User user;
   final int? index;
-  UsersAvatar({super.key, required this.user, this.index});
+  final bool disableClick;
+  UsersAvatar(
+      {super.key, required this.user, this.index, this.disableClick = false});
 
   final _storage = it.get<LocalStorage>();
   @override
@@ -20,7 +22,7 @@ class UsersAvatar extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        if (user.id == _storage.me!.id) return;
+        if (user.id == _storage.me!.id || disableClick) return;
         Navigator.of(context)
             .pushNamed(PrivateChatPage.route, arguments: user.id);
       },

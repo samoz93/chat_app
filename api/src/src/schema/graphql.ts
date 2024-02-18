@@ -18,7 +18,8 @@ export class User {
     id: string;
     name: string;
     email: string;
-    rooms?: Nullable<Nullable<ChatRoom>[]>;
+    rooms?: Nullable<ChatRoom[]>;
+    ownerRooms?: Nullable<ChatRoom[]>;
     createdAt?: Nullable<Date>;
     updatedAt?: Nullable<Date>;
     friends?: Nullable<Nullable<User>[]>;

@@ -2,8 +2,8 @@ import {
   Column,
   Entity,
   ManyToMany,
+  ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { BaseEntity } from './base.entity';
@@ -19,9 +19,7 @@ export class RoomEntity extends BaseEntity {
   @Column()
   description: string;
 
-  @OneToOne(() => UserEntity, {
-    cascade: true,
-  })
+  @ManyToOne(() => UserEntity, (user) => user.ownedRooms)
   owner: UserEntity;
 
   @ManyToMany(() => UserEntity, (user) => user.rooms)
@@ -31,4 +29,7 @@ export class RoomEntity extends BaseEntity {
     cascade: true,
   })
   messages: MessageEntity[];
+
+  @Column({ default: true })
+  isPublic: boolean;
 }

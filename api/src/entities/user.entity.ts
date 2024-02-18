@@ -3,6 +3,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { BaseEntity } from './base.entity';
@@ -19,13 +20,13 @@ export class UserEntity extends BaseEntity {
   @Column()
   password: string;
 
-  @ManyToMany(() => RoomEntity, (room) => room, {
-    cascade: true,
-  })
+  @ManyToMany(() => RoomEntity, (room) => room.users)
   @JoinTable()
   rooms?: RoomEntity[];
 
+  @OneToMany(() => RoomEntity, (room) => room.owner)
+  ownedRooms: RoomEntity[];
+
   @ManyToMany(() => UserEntity, (user) => user)
-  @JoinTable()
   friends?: UserEntity[];
 }

@@ -39,4 +39,19 @@ class ChatRepo {
 
     return data;
   }
+
+  Future<RoomDto?> createRoom(RoomDto room) async {
+    final MutationOptions options = MutationOptions(
+        document: gql(createRoomMutation), variables: room.toJson());
+
+    final result = await _graphClient.client.mutate(options);
+
+    if (result.hasException) {
+      throw ChatException(exception: result.exception!);
+    }
+
+    final rawData = result.data!['createRoom'];
+    if (rawData == null) return null;
+    return RoomDto.fromJson(rawData);
+  }
 }
