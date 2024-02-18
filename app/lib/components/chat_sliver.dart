@@ -60,7 +60,7 @@ class _ChatSliverState<T extends BaseChat> extends State<ChatSliver<T>> {
       child: Column(
         children: [
           Flexible(
-            flex: 1,
+            flex: 7,
             child: Observer(builder: (context) {
               final messages = widget.store.messageGroups;
               return CustomScrollView(
@@ -76,7 +76,8 @@ class _ChatSliverState<T extends BaseChat> extends State<ChatSliver<T>> {
               );
             }),
           ),
-          Padding(
+          Container(
+            height: 10.h,
             padding: EdgeInsets.all(10.sp),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

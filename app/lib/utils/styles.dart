@@ -45,14 +45,14 @@ textStyle(BuildContext context) => const TextTheme(
 elevatedButtonTheme(BuildContext context) => ElevatedButtonThemeData(
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all(
-          Theme.of(context).colorScheme.secondary,
+          Theme.of(context).colorScheme.primary,
         ),
         foregroundColor: MaterialStateProperty.all(
           Colors.white,
         ),
         shape: MaterialStateProperty.all(
           RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(3.w),
+            borderRadius: BorderRadius.circular(1.w),
           ),
         ),
       ),

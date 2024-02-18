@@ -127,30 +127,31 @@ class _AuthPageState extends State<AuthPage>
                   child: Form(
                     key: _key,
                     child: SingleChildScrollView(
-                      child: SizedBox(
-                        height: 100.h,
-                        child: Flex(
-                          direction: Axis.vertical,
+                      child: Center(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            WidgetMask(
-                              mask: CustomPaint(
-                                painter: ShaderPainter(
-                                  shader: shader,
-                                  repaint: _val,
-                                ),
-                              ),
-                              childSaveLayer: true,
-                              blendMode: BlendMode.srcIn,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(15.h),
-                                child: Container(
-                                  margin: EdgeInsets.only(
-                                    top: 20.sp,
+                            SizedBox(
+                              height: 40.h,
+                              child: WidgetMask(
+                                mask: CustomPaint(
+                                  painter: ShaderPainter(
+                                    shader: shader,
+                                    repaint: _val,
                                   ),
-                                  child: Image.network(
-                                    "https://icones.pro/wp-content/uploads/2021/05/icone-de-chat-violet.png",
-                                    fit: BoxFit.cover,
+                                ),
+                                childSaveLayer: true,
+                                blendMode: BlendMode.srcIn,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(15.h),
+                                  child: Container(
+                                    margin: EdgeInsets.only(
+                                      top: 20.sp,
+                                    ),
+                                    child: Image.network(
+                                      "https://icones.pro/wp-content/uploads/2021/05/icone-de-chat-violet.png",
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -181,36 +182,32 @@ class _AuthPageState extends State<AuthPage>
                                   )
                                   .shakeX(),
                             ),
-                            Flexible(
-                              flex: 1,
-                              fit: FlexFit.loose,
-                              child: Column(
-                                children: [
-                                  ElevatedButton(
-                                    onPressed: submit,
-                                    child: Text(
-                                      mode == AuthMode.signIn
-                                          ? "Sign In"
-                                          : "Sign Up",
-                                    ),
+                            Column(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: submit,
+                                  child: Text(
+                                    mode == AuthMode.signIn
+                                        ? "Sign In"
+                                        : "Sign Up",
                                   ),
-                                  TextButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        _refreshKey = UniqueKey();
-                                        mode = mode == AuthMode.signIn
-                                            ? AuthMode.signUp
-                                            : AuthMode.signIn;
-                                      });
-                                    },
-                                    child: Text(
-                                      mode == AuthMode.signIn
-                                          ? "Don't have an account? Sign Up"
-                                          : "Already have an account? Sign In",
-                                    ),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _refreshKey = UniqueKey();
+                                      mode = mode == AuthMode.signIn
+                                          ? AuthMode.signUp
+                                          : AuthMode.signIn;
+                                    });
+                                  },
+                                  child: Text(
+                                    mode == AuthMode.signIn
+                                        ? "Don't have an account? Sign Up"
+                                        : "Already have an account? Sign In",
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             )
                           ],
                         ),
